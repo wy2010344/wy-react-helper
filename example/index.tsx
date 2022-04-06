@@ -8,6 +8,7 @@ import { OBTodoApp, TodoApp } from './mobxtodo';
 const App = () => {
   const [count, setCount] = React.useState(1)
   console.log("render-app")
+
   return (
     <div>
       <PortalArea />
@@ -65,6 +66,22 @@ const TestPanel = observer(() => {
 
 const TestPanel2 = observer(() => {
   const count = useStoreTriggerRender(shareCount)
+
+  const [idx, setIdx] = React.useState(0)
+  useEffect(() => {
+    console.log("effect", idx)
+
+    return () => {
+      console.log("effect-destroy", idx)
+    }
+  }, [idx])
+  React.useLayoutEffect(() => {
+    console.log("layout-effect", idx)
+
+    return () => {
+      console.log("layout-effect-destroy", idx)
+    };
+  }, [idx])
   return <PortalCall>{x => <PanelReact key={x} index={x}>
     <div>测试portal</div>
     <button onClick={() => {
@@ -72,11 +89,13 @@ const TestPanel2 = observer(() => {
       console.log(shareValue())
     }}>增加 {shareValue()}</button>
     <div>share-count {count}</div>
+    <button onClick={() => setIdx(idx + 1)}>增加idx {idx}</button>
   </PanelReact>}</PortalCall>
 })
 
 
 import { observer as observerMOBX } from 'mobx-react'
+import { useEffect } from 'react';
 const TestPanel3 = observerMOBX(() => {
   return <PortalCall>{x => {
     return <PanelReact key={x} index={x}>
