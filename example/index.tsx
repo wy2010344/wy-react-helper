@@ -96,6 +96,7 @@ const TestPanel2 = observer(() => {
 
 import { observer as observerMOBX } from 'mobx-react'
 import { useEffect } from 'react';
+import Post from './blogLayout/Post';
 const TestPanel3 = observerMOBX(() => {
   return <PortalCall>{x => {
     return <PanelReact key={x} index={x}>
@@ -105,4 +106,4 @@ const TestPanel3 = observerMOBX(() => {
 })
 
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<Post />, document.getElementById('root'));

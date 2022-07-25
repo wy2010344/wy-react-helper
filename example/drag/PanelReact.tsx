@@ -24,6 +24,7 @@ export default function PanelReact({
       }
     })
   })
+  console.log("render")
   return (
     <div ref={container} style={{
       position: 'absolute',

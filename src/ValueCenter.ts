@@ -10,8 +10,10 @@ export class ValueCenter<T>{
     return this.value
   }
   set(value: T) {
-    this.value = value
-    this.pool.forEach(notify => notify(value))
+    if (value != this.value) {
+      this.value = value
+      this.pool.forEach(notify => notify(value))
+    }
   }
   add(notify: NotifyHandler<T>) {
     if (!this.pool.has(notify)) {
