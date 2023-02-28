@@ -24,29 +24,26 @@ export function createShareStore({
   read(key: string): string
   write(key: string, value: string): void
 }) {
-  const deletePool: Map<string, {
-    value: StringBridge<any>
-    notify(v: any): void
-  }> = new Map()
-  Object.entries(map).forEach(function ([key, value]) {
+  const mapList = Object.entries(map).map(function ([key, value]) {
     function notify(v: any) {
       write(key, value.toString(v))
     }
-    deletePool.set(key, {
-      value,
-      notify
-    })
-    value.value.add(notify)
+    return {
+      init() {
+        value.value.set(read(key))
+      },
+      destroy: value.value.subscribe(notify)
+    }
   })
   return {
     init() {
-      deletePool.forEach(function ({ value }, key) {
-        value.value.set(read(key))
+      mapList.forEach(function ({ init }) {
+        init()
       })
     },
     destroy() {
-      deletePool.forEach(function ({ value, notify }) {
-        value.value.remove(notify)
+      mapList.forEach(function ({ destroy }) {
+        destroy()
       })
     }
   }
