@@ -11,3 +11,8 @@ export function useOnlyId(prefix?: string) {
     id: (prefix || "") + ref.current
   }
 }
+
+
+export function getOnlyId() {
+  return id++
+}
