@@ -1,51 +1,99 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import { useOnlyId } from "./useOnlyId"
-import { ValueCenter, useStoreTriggerRender } from "./ValueCenter"
-
-
-
-export function createSharePortal() {
-  const portals = new ValueCenter<JSX.Element[]>([])
-
-  function buildDestroy(id: string, p: JSX.Element) {
-    useEffect(() => {
-      const ps = portals.get()
-      const idx = ps.findIndex(v => v.key == id)
-      if (idx < 0) {
-        portals.set(ps.concat(p))
-      } else {
-        ps.splice(idx, 1, p)
-        const vs = ps.slice()
-        portals.set(vs)
-      }
-    }, [p])
-    useEffect(function () {
-      return () => {
-        portals.set(portals.get().filter(v => v.key != id))
-      }
-    }, [])
+import { ValueCenter, useStoreTriggerRender, useValueCenterWith, valueCenterOf } from "./ValueCenter"
+import { HookRender } from "./HookRender";
+const map = new Map();
+let uid = 1;
+function getId(key: any) {
+  let v = map.get(key);
+  if (!v) {
+    v = uid++;
+    map.set(key, v);
   }
+  return v;
+}
+
+export type SharePortalModel = ValueCenter<JSX.Element>[];
+export function renderSharePortal(store: ValueCenter<SharePortalModel>) {
+  return useMemo(() => {
+    return (
+      <HookRender
+        render={() => {
+          const list = useStoreTriggerRender(store);
+          return (
+            <>
+              {list.map((row) => {
+                return (
+                  <HookRender
+                    key={getId(row)}
+                    render={() => {
+                      return useMemo(() => {
+                        return (
+                          <HookRender
+                            render={() => {
+                              return useStoreTriggerRender(row);
+                            }}
+                          />
+                        );
+                      }, [row]);
+                    }}
+                  />
+                );
+              })}
+            </>
+          );
+        }}
+      />
+    );
+  }, [store]);
+}
+
+
+export function useCreateSharePortal() {
+  const list = useValueCenterWith<SharePortalModel>([]);
   return {
-    portals,
-    usePortals() {
-      return useStoreTriggerRender(portals)
-    },
-    PortalCall({ children }: { children(i: string): JSX.Element }) {
-      const { id } = useOnlyId()
-      buildDestroy(id, children(id))
-      return null
-    },
-    Portal({ children }: { children: JSX.Element }) {
-      const { id } = useOnlyId()
-      buildDestroy(id, { ...children, key: id })
-      return null
-    },
-    PortalFragmet({ children }: { children: React.ReactNode }) {
-      const { id } = useOnlyId()
-      buildDestroy(id, <React.Fragment key={id}>
-        {children}
-      </React.Fragment>)
-      return null
+    list,
+    append(value: ValueCenter<JSX.Element>) {
+      const oldList = list.get().filter((v) => v != value);
+      list.set(oldList.concat(value));
+      return function () {
+        list.set(list.get().filter((v) => v != value));
+      }
     }
+  };
+}
+
+export type SharePortalOperate = ReturnType<typeof useCreateSharePortal>["append"];
+
+export function useAlawaysCenter(value: JSX.Element, deps?: readonly any[]) {
+  const store = useValueCenterWith(value);
+  useEffect(() => {
+    store.set(value);
+  }, deps);
+  return store;
+}
+
+export function useAppendSharePop(
+  store: SharePortalOperate,
+  value: JSX.Element,
+  deps?: readonly any[]
+) {
+  const rightPanel = useAlawaysCenter(value, deps);
+  useEffect(() => {
+    return store(rightPanel)
+  }, []);
+}
+
+
+export function useSharePortal() {
+  const { list, append } = useCreateSharePortal()
+
+  return {
+    render() {
+      renderSharePortal(list)
+    },
+    useAppend(value: JSX.Element, deps?: readonly any[]) {
+      useAppendSharePop(append, value, deps)
+    },
   }
 }
