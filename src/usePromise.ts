@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useChange } from "./useChange"
 import { useEvent } from "./useEvent"
 import { useVersionLock } from "./Lock"
@@ -10,6 +10,14 @@ export type PromiseResult<T> = {
 } | {
   type: "error",
   value: any
+}
+export type PromiseResultSuccessValue<T> = T extends {
+  type: "success"
+  value: infer V
+} ? V : never
+
+type VersionPromiseResult<Res> = PromiseResult<Res> & {
+  version: number
 }
 export function simpleEqual<T>(a: T, b: T) {
   return a == b;
@@ -33,15 +41,8 @@ export function arrayEqual<T>(
   }
   return false;
 }
-type GetPromiseRequest<T> = (signal?: AbortSignal, ...vs: any[]) => Promise<T>;
-export type GetPromise<T> = {
-  version: number;
-  request: GetPromiseRequest<T>;
-};
-type GetPromiseResult<T> = PromiseResult<T> & {
-  getPromise: GetPromise<T>;
-};
-type OnFinally<T> = (data: GetPromiseResult<T>, ...vs: any[]) => void;
+export type GetPromiseRequest<T> = (signal?: AbortSignal, ...vs: any[]) => Promise<T>;
+type OnFinally<T> = (data: VersionPromiseResult<T>, ...vs: any[]) => void;
 function createAbortController() {
   if ("AbortController" in globalThis) {
     const signal = new AbortController();
@@ -57,68 +58,59 @@ function createAbortController() {
     cancel() { },
   };
 }
-export type FalseType = false | undefined | null | 0 | "" | void;
-function usePromise<T>(
-  getPromise: GetPromise<T> | FalseType,
-  initOnFinally: OnFinally<T>
-) {
-  const onFinally = useEvent(function (data: GetPromiseResult<T>) {
-    if (getPromise == data.getPromise) {
-      initOnFinally(data);
-    }
-  });
-  useEffect(() => {
-    if (getPromise) {
-      const signal = createAbortController();
-      getPromise
-        .request(signal.signal)
-        .then((data) => {
-          onFinally({ type: "success", value: data, getPromise });
-        })
-        .catch((err) => {
-          onFinally({ type: "error", value: err, getPromise });
-        });
-      return signal.cancel;
-    }
-  }, [getPromise, onFinally]);
+
+export function createAndFlushAbortController(ref: React.MutableRefObject<(() => void) | undefined>) {
+  const controller = createAbortController()
+  const last = ref.current
+  if (last) {
+    last()
+  }
+  ref.current = controller.cancel
+  return controller.signal
 }
 
+export type FalseType = false | undefined | null | 0 | "" | void;
 type OutPromiseOrFalse<T> = GetPromiseRequest<T> | FalseType;
 export function useMemoPromiseCall<T, Deps extends readonly any[]>(
-  onFinally: OnFinally<T>,
+  initOnFinally: OnFinally<T>,
   effect: () => OutPromiseOrFalse<T>,
   deps: Deps
 ) {
   const versonRef = useRef(0);
-  const getPromise = useMemo<GetPromise<T> | FalseType>(() => {
-    const out = effect();
-    if (out) {
-      const version = versonRef.current++;
-      return {
-        version,
-        request: out
-      };
+  const mout = useMemo(() => {
+    return {
+      version: versonRef.current++,
+      request: effect()
     }
-    return out as FalseType;
-  }, deps);
-  usePromise(getPromise, onFinally);
-  return getPromise;
+  }, deps)
+  const {
+    version,
+    request
+  } = mout
+  const onFinally = useEvent(function (data: VersionPromiseResult<T>) {
+    if (version == data.version) {
+      initOnFinally(data)
+    }
+  })
+  useEffect(() => {
+    if (request) {
+      const signal = createAbortController();
+      request(signal.signal).then(data => {
+        onFinally({ type: "success", value: data, version })
+      }).catch(err => {
+        onFinally({ type: "error", value: err, version })
+      })
+      return signal.cancel
+    }
+  }, [version, request, onFinally])
+  return mout
 }
 export function useCallbackPromiseCall<T, Deps extends readonly any[]>(
   callback: GetPromiseRequest<T>,
   onFinally: OnFinally<T>,
   deps: Deps
 ) {
-  const versonRef = useRef(0);
-  const getPromise = useMemo(() => {
-    const version = versonRef.current++;
-    return {
-      version,
-      request: callback,
-    };
-  }, deps);
-  usePromise(getPromise, onFinally);
-  return getPromise;
+  return useMemoPromiseCall(onFinally, () => callback, deps)
 }
 
 /**
@@ -134,12 +126,8 @@ export function useBaseMemoPromiseState<T, Deps extends readonly any[] = any[]>(
   effect: () => OutPromiseOrFalse<T>,
   deps: Deps
 ) {
-  const [data, updateData] = useState<
-    PromiseResult<T> & {
-      getPromise: GetPromise<T>;
-    }
-  >();
-  const hasPromise = useMemoPromiseCall(
+  const [data, updateData] = useState<VersionPromiseResult<T>>();
+  const { version, request } = useMemoPromiseCall(
     (data) => {
       onFinally?.(data);
       updateData(data);
@@ -147,12 +135,12 @@ export function useBaseMemoPromiseState<T, Deps extends readonly any[] = any[]>(
     effect,
     deps
   );
-  const outData = hasPromise ? data : undefined;
+  const outData = request ? data : undefined;
   return {
     data: outData,
-    loading: outData?.getPromise != hasPromise,
-    getPromise: hasPromise,
-    setData: buildSetData(updateData),
+    version,
+    loading: outData?.version != version,
+    setData: buildPromiseResultSetData(updateData),
   };
 }
 export function useMemoPromiseState<T, Deps extends readonly any[]>(
@@ -162,16 +150,10 @@ export function useMemoPromiseState<T, Deps extends readonly any[]>(
   return useBaseMemoPromiseState(undefined, effect, deps)
 }
 
-
-function buildSetData<T>(
-  updateData: ReduceState<
-    | (PromiseResult<T> & {
-      getPromise: GetPromise<T>;
-    })
-    | undefined
-  >
-) {
-  return function setData(fun: T | ((v: T) => T)) {
+export function buildPromiseResultSetData<F extends PromiseResult<any>>(
+  updateData: ReduceState<F | undefined>
+): ReduceState<PromiseResultSuccessValue<F>> {
+  return function setData(fun) {
     updateData((old) => {
       if (old?.type == "success") {
         return {
@@ -189,26 +171,9 @@ export function useBaseCallbackPromiseState<
 >(
   onFinally: undefined | OnFinally<T>,
   effect: GetPromiseRequest<T>,
-  deps: Deps) {
-  const [data, updateData] = useState<
-    PromiseResult<T> & {
-      getPromise: GetPromise<T>;
-    }
-  >();
-  const hasPromise = useCallbackPromiseCall(
-    effect,
-    (data) => {
-      onFinally?.(data);
-      updateData(data);
-    },
-    deps
-  );
-  return {
-    data,
-    loading: data?.getPromise != hasPromise,
-    getPromise: hasPromise,
-    setData: buildSetData(updateData),
-  };
+  deps: Deps
+) {
+  return useBaseMemoPromiseState(onFinally, () => effect, deps)
 }
 /**
  * 常用的根据依赖返回异步状态
@@ -258,10 +223,6 @@ export function useMutationWithLoading<Req extends any[], Res>(effect: (...vs: R
   }, loading] as const
 }
 
-type MutationResult<Res> = PromiseResult<Res> & {
-  version: number
-}
-
 /**
  * 阻塞的请求,并带有状态
  * @param effect 
@@ -269,7 +230,7 @@ type MutationResult<Res> = PromiseResult<Res> & {
  */
 export function useMutationState<Req extends any[], Res>(effect: (...vs: Req) => Promise<Res>) {
   const [versionLock, updateVersionLock] = useVersionLock()
-  const [data, updateData] = useChange<MutationResult<Res>>()
+  const [data, updateData] = useChange<VersionPromiseResult<Res>>()
   return [useEvent(function (...vs: Req) {
     if ((data?.version || 0) != versionLock.current) {
       return
@@ -290,65 +251,97 @@ export function useMutationState<Req extends any[], Res>(effect: (...vs: Req) =>
  * @returns 
  */
 export function useSerialRequest<Req extends any[], Res>(
-  callback: (...vs: Req) => Promise<Res>,
-  effect: (res: PromiseResult<Res>) => void
+  callback: (vs: Req, version: number, signal?: AbortSignal) => Promise<Res>,
+  effect: (res: VersionPromiseResult<Res>, version: number) => void
 ) {
+  const lastCancelRef = useRef<(() => void) | undefined>(undefined)
   const [versionLock, updateVersion] = useVersionLock();
-  return [function (...vs: Req) {
-    const version = updateVersion();
-    callback(...vs)
-      .then((data) => {
-        if (version == versionLock.current) {
-          effect({
-            type: "success",
-            value: data,
-          });
-        }
-      })
-      .catch((err) => {
-        if (version == versionLock.current) {
-          effect({
-            type: "error",
-            value: err,
-          });
-        }
-      });
-  }, updateVersion] as const
+  return [
+    function (...vs: Req) {
+      const version = updateVersion();
+      return callback(vs, version, createAndFlushAbortController(lastCancelRef))
+        .then((data) => {
+          if (version == versionLock.current) {
+            effect({
+              type: "success",
+              value: data,
+              version
+            }, version);
+            return true;
+          }
+        })
+        .catch((err) => {
+          if (version == versionLock.current) {
+            effect({
+              type: "error",
+              value: err,
+              version
+            }, version);
+            return false;
+          }
+        });
+    },
+    updateVersion,
+  ] as const;
 }
-
-
 /**
- * 将上面的usePromise转换成promise
- * @param getPromise
+ * 可重载的异步请求,封闭一个loading
+ * @param callback
+ * @param effect
  * @returns
  */
-export function useRefreshPromise(
-  getPromise: GetPromise<any>
+export function useSerialRequestLoading<Req extends any[], Res>(
+  callback: (vs: Req, signal?: AbortSignal) => Promise<Res>,
+  effect: (res: VersionPromiseResult<Res>) => void
 ) {
-  const refreshFlag = useRef<{
-    getPromise: GetPromise<any>;
-    notify(): void;
-  }>();
-  return {
-    request: useEvent(function (updateVersion: () => void) {
-      return new Promise((resolve) => {
-        updateVersion();
-        refreshFlag.current = {
-          getPromise,
-          notify() {
-            refreshFlag.current = undefined;
-            resolve(null);
-          },
-        };
-      });
-    }),
-    notify(getPromise: GetPromise<any>) {
-      if (refreshFlag.current) {
-        // console.log('ver-', getPromise.version, refreshFlag.current.getPromise.version)
-        if (getPromise.version > refreshFlag.current.getPromise.version) {
-          refreshFlag.current.notify();
-        }
-      }
+  const [reqVersion, setReqVersion] = useState(0);
+  const [resVersion, setResVersion] = useState(0);
+  const [request, updateVersion] = useSerialRequest(
+    function (args: Req, v, signal) {
+      setReqVersion(v);
+      return callback(args, signal);
     },
-  };
+    function (res, v) {
+      setResVersion(v);
+      return effect(res);
+    }
+  );
+  return [request, reqVersion != resVersion, updateVersion] as const;
 }
+
+
+function buildRefreshPromise<T>(shouldNotify: (a: T, old: T) => boolean) {
+  return function useRefreshPromise(getPromise: T) {
+    const refreshFlag = useRef<{
+      getPromise: T;
+      notify(): void;
+    }>();
+    return {
+      request: useEvent(function (updateVersion: () => void) {
+        return new Promise((resolve) => {
+          updateVersion();
+          refreshFlag.current = {
+            getPromise,
+            notify() {
+              refreshFlag.current = undefined;
+              resolve(null);
+            },
+          };
+        });
+      }),
+      notify(getPromise: T) {
+        if (refreshFlag.current) {
+          if (shouldNotify(getPromise, refreshFlag.current.getPromise)) {
+            refreshFlag.current.notify();
+          }
+        }
+      },
+    };
+  }
+}
+/**
+ * 如果是仅用数字的VersionPromiseResult
+ */
+export const useVersionRefreshPromise = buildRefreshPromise<number>(function (a, b) {
+  return a > b
+})

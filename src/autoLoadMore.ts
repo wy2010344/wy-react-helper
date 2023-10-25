@@ -1,14 +1,20 @@
-import { Reducer, useCallback, useEffect, useReducer } from "react"
+import { Reducer, useCallback, useEffect, useReducer, useRef } from "react"
 import { useEvent } from "./useEvent"
-import { PromiseResult } from "./usePromise"
+import { PromiseResult, createAndFlushAbortController } from "./usePromise"
 import { useAlaways } from "./useAlaways"
 import { useVersionLock } from "./Lock"
+import { emptyFun } from "./util"
 export type LoadAfterResult<T, K> = {
   list: T[];
   nextKey: K;
   hasMore: boolean;
 };
 type GetAfter<T, K> = (key: K) => Promise<LoadAfterResult<T, K>>;
+
+type GetAfterEffect<T, K> = (
+  key: K,
+  signal?: AbortSignal
+) => Promise<LoadAfterResult<T, K>>;
 type AutoLoadMoreModel<T, K> =
   | {
     getAfter: GetAfter<T, K>;
@@ -100,8 +106,6 @@ function reducerAutoLoadMore<T, K>(
   debugLog("更新失败", action);
   return old;
 }
-
-function emptyWhenError(err: any) { }
 /**
  *
  * T 列表类型
@@ -112,14 +116,17 @@ function emptyWhenError(err: any) { }
  * @returns
  */
 export function useAutoLoadMore<T, K>(
-  effect: GetAfter<T, K>,
+  effect: GetAfterEffect<T, K>,
   deps: readonly any[]
 ) {
   const [data, dispatch] = useReducer<Reducer<AutoLoadMoreModel<T, K>, AutoLoadMoreAction<T, K>>>(
     reducerAutoLoadMore,
     undefined
   );
-  const getAfter = useCallback(effect, deps);
+  const lastCancelRef = useRef<() => void>()
+  const getAfter = useCallback((k: K) => {
+    return effect(k, createAndFlushAbortController(lastCancelRef))
+  }, deps);
   const judge = useAlaways({
     shouldDispatchReload(version: number, oldGetAfter: GetAfter<T, K>) {
       return version == lockVersionRef.current && getAfter == oldGetAfter;
@@ -136,7 +143,7 @@ export function useAutoLoadMore<T, K>(
   return {
     reloading: getAfter != data?.getAfter,
     data: data?.data,
-    reload: useEvent(async function (initKey: K, whenError = emptyWhenError) {
+    reload: useEvent(async function (initKey: K, whenError = emptyFun) {
       const version = updateLockVersion()
       let action: AutoLoadMoreActionReload<T, K>;
       try {
@@ -170,7 +177,7 @@ export function useAutoLoadMore<T, K>(
         return action;
       }
     }),
-    loadMore: useEvent(function (whenError = emptyWhenError) {
+    loadMore: useEvent(function (whenError = emptyFun) {
       debugLog("触发更新", lockVersionRef.current);
       if (data?.data.type == "success" && data.data.value.hasMore) {
         if (lockVersionRef.current != data.data.value.version) {
@@ -233,7 +240,7 @@ export function useMemoAutoLoadMore<T, K>({
   body,
 }: {
   initKey: K;
-  body: GetAfter<T, K>;
+  body: GetAfterEffect<T, K>;
 }, deps: readonly any[]) {
   const { data, reload, reloading, loadMore, setList } = useAutoLoadMore(body, deps);
   useEffect(() => {
