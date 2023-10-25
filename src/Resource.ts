@@ -1,15 +1,18 @@
 import { valueCenterOf } from "./ValueCenter"
-import { GetPromise, PromiseResult } from "./usePromise"
+import { GetPromiseRequest, PromiseResult, createAndFlushAbortController } from "./usePromise"
 import { useStoreTriggerRender } from "./ValueCenter"
 import { quote } from "./util"
 
 
 
-export function createResource<T>(getResource: GetPromise<T>) {
+export function createResource<T>(getResource: GetPromiseRequest<T>) {
   const resource = valueCenterOf<PromiseResult<T> | undefined>(undefined)
   let promise: Promise<any> | undefined = undefined
+  const cancelRef = {
+    current: undefined
+  }
   function reloadPromise() {
-    const thePromise = getResource().then(value => {
+    const thePromise = getResource(createAndFlushAbortController(cancelRef)).then(value => {
       if (thePromise == promise) {
         resource.set({
           type: "success",

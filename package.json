@@ -11,6 +11,8 @@
     "node": ">=10"
   },
   "scripts": {
+    "ts": "tsc --noEmit --incremental",
+    "ts:watch": "yarn ts --watch",
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --passWithNoTests",
