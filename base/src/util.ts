@@ -1,11 +1,12 @@
 
-import { useMemo } from 'react'
+import { useMemo, useReducer } from 'react'
 import { ReduceState } from './ValueCenter'
 
 export const emptyArray = [] as readonly []
 export function quote<T>(v: T, ...vs: any[]) {
   return v
 }
+export type EmptyFun = (...vs: any[]) => void
 export function emptyFun() { }
 /**
  * 对react-setState的局部嵌套
@@ -86,4 +87,86 @@ export function useBuildSubSetArray<T>(
   equal: ((v: T) => boolean)
 ): ReduceRowState<T> {
   return useMemo(() => buildSubSetArray(parentSet, equal), [])
+}
+
+
+
+
+export function getOutResolvePromise<T>() {
+  let resolve: (v: T) => void
+  let reject: (v?: any) => void
+  const promise = new Promise(function (_resolve, _reject) {
+    resolve = _resolve
+    reject = _reject
+  })
+  return [
+    promise,
+    resolve!,
+    reject!
+  ] as const
+}
+
+
+export function buildRemoveWhere<T, M>(equal: (m: M, a: T, idx: number) => any) {
+  return function (vs: T[], m: M) {
+    for (let i = vs.length - 1; i > -1; i--) {
+      const row = vs[i]
+      if (equal(m, row, i)) {
+        vs.splice(i, 1)
+      }
+    }
+  }
+}
+
+
+export function simpleEqual<T>(a: T, b: T) {
+  return a == b;
+}
+export function arrayEqual<T>(
+  a1: readonly T[],
+  a2: readonly T[],
+  equal: (x: T, y: T) => boolean
+) {
+  if (a1 == a2) {
+    return true;
+  }
+  const len = a1.length;
+  if (a2.length == len) {
+    for (let i = 0; i < len; i++) {
+      if (!equal(a1[i], a2[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+export const removeEqual = buildRemoveWhere(simpleEqual)
+
+export const removeWhere = buildRemoveWhere(function <T>(fun: (v: T, i: number) => any, v: T, i: number) {
+  return fun(v, i)
+})
+
+export function createEmptyArray<T>(): T[] {
+  return []
+}
+
+
+export declare type ReducerFun<F, T> = (old: T, action: F) => T;
+export function createUseReducer<A, M, I = M>(
+  reducer: ReducerFun<A, M>,
+  initFun?: (i: I) => M
+) {
+  return function (init: I) {
+    return useReducer(reducer, init, initFun || quote as any)
+  }
+}
+
+export function createUseReducerFun<A, M>(
+  reducer: ReducerFun<A, M>,
+) {
+  return function (initFun: () => M) {
+    return useReducer(reducer, undefined, initFun)
+  }
 }
