@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "wy-react-helper": {
+      "signature": "a7269449b7443774a698fbfb8ebc1f8c",
+      "file": true
+    }
+  }
+}

@@ -19,28 +19,6 @@ export type PromiseResultSuccessValue<T> = T extends {
 type VersionPromiseResult<Res> = PromiseResult<Res> & {
   version: number
 }
-export function simpleEqual<T>(a: T, b: T) {
-  return a == b;
-}
-export function arrayEqual<T>(
-  a1: readonly T[],
-  a2: readonly T[],
-  equal: (x: T, y: T) => boolean
-) {
-  if (a1 == a2) {
-    return true;
-  }
-  const len = a1.length;
-  if (a2.length == len) {
-    for (let i = 0; i < len; i++) {
-      if (!equal(a1[i], a2[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
-}
 export type GetPromiseRequest<T> = (signal?: AbortSignal, ...vs: any[]) => Promise<T>;
 type OnFinally<T> = (data: VersionPromiseResult<T>, ...vs: any[]) => void;
 function createAbortController() {
