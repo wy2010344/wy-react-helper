@@ -109,12 +109,15 @@ export function getOutResolvePromise<T>() {
 
 export function buildRemoveWhere<T, M>(equal: (m: M, a: T, idx: number) => any) {
   return function (vs: T[], m: M) {
+    let count = 0
     for (let i = vs.length - 1; i > -1; i--) {
       const row = vs[i]
       if (equal(m, row, i)) {
+        count++
         vs.splice(i, 1)
       }
     }
+    return count
   }
 }
 
@@ -168,5 +171,52 @@ export function createUseReducerFun<A, M>(
 ) {
   return function (initFun: () => M) {
     return useReducer(reducer, undefined, initFun)
+  }
+}
+
+
+
+
+export class ArrayHelper<V>{
+  private dirty = false
+  private array: V[]
+  constructor(
+    _array: readonly V[]
+  ) {
+    this.array = _array as V[]
+  }
+
+  get(): readonly V[] {
+    return this.array
+  }
+  private safeCopy() {
+    if (!this.dirty) {
+      this.dirty = true
+      this.array = this.array.slice()
+    }
+  }
+  insert(n: number, v: V) {
+    this.safeCopy()
+    this.array.splice(n, 0, v)
+  }
+  removeAt(n: number) {
+    this.safeCopy()
+    this.array.splice(n, 1)
+  }
+  replace(n: number, v: V) {
+    this.safeCopy()
+    this.array[n] = v
+  }
+
+  removeWhere(fun: (v: V, i: number) => any) {
+    let count = 0
+    for (let i = this.array.length - 1; i > -1; i--) {
+      const row = this.array[i]
+      if (fun(row, i)) {
+        count++
+        this.removeAt(i)
+      }
+    }
+    return count
   }
 }

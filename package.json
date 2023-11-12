@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "stylis": "^4.3.0"
-  },
-  "devDependencies": {
-    "@types/stylis": "^4.2.2"
-  }
-}
