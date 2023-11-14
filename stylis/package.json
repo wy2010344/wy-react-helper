@@ -33,7 +33,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "wy-react-stylis-helper",
+  "name": "wy-react-stylis",
   "author": "wyknmjj",
   "module": "dist/stylis.esm.js",
   "size-limit": [

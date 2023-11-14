@@ -13,6 +13,7 @@ import { HookRender } from "./HookRender"
 export interface ExitModel<V> {
   value: V
   key: any
+  enterIgnore?: boolean
   exiting?: boolean
   promise: Promise<any>
   resolve(v?: any): void
@@ -34,6 +35,7 @@ export function ExitAnimate<V>(
     exitIgnore,
     enterIgnore,
     onExitComplete,
+    onEnterComplete,
     onAnimateComplete,
     render,
   }: {
@@ -43,6 +45,7 @@ export function ExitAnimate<V>(
     exitIgnore?(v: V): any
     enterIgnore?(v: V): boolean
     onExitComplete?(): void
+    onEnterComplete?(): void
     onAnimateComplete?(): void
     render: (v: ExitModel<V>) => React.ReactNode
   }
@@ -89,6 +92,7 @@ export function ExitAnimate<V>(
         key,
         hide: mode == 'wait' && destroyCount != 0,
         needCollect: true,
+        enterIgnore: enterIgnore?.(v),
         promise,
         resolve
       })
@@ -145,6 +149,17 @@ export function ExitAnimate<V>(
         })
       }
     }
+    if (onEnterComplete) {
+      const enterPromises: Promise<any>[] = []
+      for (const add of thisAddList) {
+        if (!enterIgnore?.(add.value)) {
+          enterPromises.push(add.promise)
+        }
+      }
+      if (enterPromises.length) {
+        Promise.all(enterPromises).then(onEnterComplete)
+      }
+    }
     if (onAnimateComplete) {
       const promiseAll = destroyPromises.slice()
       for (const add of thisAddList) {
@@ -152,7 +167,9 @@ export function ExitAnimate<V>(
           promiseAll.push(add.promise)
         }
       }
-      Promise.all(promiseAll).then(onAnimateComplete)
+      if (promiseAll.length) {
+        Promise.all(promiseAll).then(onAnimateComplete)
+      }
     }
   })
   return <>{newCacheList.get().filter(getNotHide).map(value => {

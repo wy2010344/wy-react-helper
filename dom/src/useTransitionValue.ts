@@ -43,14 +43,23 @@ export function useBaseLifeTransSameTime<T>(exiting: any, config: {
   show: T
   willExit?: T
   exit: T
-}, didChange?: (exiting?: boolean) => void) {
+}, ext?: {
+  disabled?: any
+  didChange?: (exiting?: boolean) => void
+}) {
   const [state, setState] = useChange<'show' | 'hide'>()
   useEffect(() => {
+    if (ext?.disabled) {
+      return
+    }
     requestAnimationFrame(function () {
       setState(exiting ? 'hide' : 'show')
-      didChange?.(exiting)
+      ext?.didChange?.(exiting)
     })
   }, [!exiting])
+  if (ext?.disabled) {
+    return config.show
+  }
   if (!state) {
     return config.from
   }
@@ -98,8 +107,12 @@ export function useLifeTransSameTime<T>(
     exit: T
   },
   resolve: () => void,
-  timeout: number
+  timeout: number,
+  disabled?: boolean
 ) {
   const updateVersion = useTimeoutVersion(resolve, timeout)
-  return useBaseLifeTransSameTime(exiting, config, updateVersion)
+  return useBaseLifeTransSameTime(exiting, config, {
+    didChange: updateVersion,
+    disabled
+  })
 }
