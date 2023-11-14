@@ -106,6 +106,14 @@ export function getOutResolvePromise<T>() {
   ] as const
 }
 
+export function objectMap<M, F>(a: Record<string, M>, fun: (v: M, key: string) => F) {
+  const out = {} as any
+  for (const key in a) {
+    out[key] = fun(a[key], key)
+  }
+  return out as Record<string, F>
+}
+
 
 export function buildRemoveWhere<T, M>(equal: (m: M, a: T, idx: number) => any) {
   return function (vs: T[], m: M) {

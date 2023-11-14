@@ -1,6 +1,6 @@
-import { ExitAnimateMode, ExitModel, HookRender, OneExitAnimate } from "wy-react-helper"
+import { ExitAnimateMode, ExitModel, HookRender, OneExitAnimate, emptyArray } from "wy-react-helper"
 import { useBaseLifeTransSameTime, useLifeTransSameTime } from "./useTransitionValue"
-import React from "react"
+import React, { useEffect, useRef } from "react"
 
 
 
@@ -21,18 +21,11 @@ export type ClassAndStyle = {
  * 平等替换很简单,各自作自己的配置
  */
 export type TAnimateValueTime<T> = {
-  //只创建(新增)
-  from: T
-  show: T,
-  willExit?: never
-  exit?: never
-  timeout: number
-} | {
-  //只销毁,告知销毁,并配送销毁参数
-  from?: never
-  show?: never
+  //创建与销毁的配置.在销毁时仍然生效
+  from?: T
+  show?: T
   willExit?: T
-  exit: T
+  exit?: T
   timeout: number
 }
 
@@ -43,9 +36,11 @@ export function OneTAnimateTime<T>(
     ...args
   }: {
     onAnimateComplete?(): void,
+    show?: any
+    ignore?: any
     value: TAnimateValueTime<T>,
     render: (
-      args: T,
+      args: T | undefined,
       ext: {
         exiting?: boolean;
         promise: Promise<any>;
@@ -54,37 +49,29 @@ export function OneTAnimateTime<T>(
   },
 ) {
   return <OneExitAnimate
-    show={value.from}
     {...args}
     render={v => {
       return <HookRender
         key={v.key}
         render={() => {
-          const args = useLifeTransSameTime<T>(
+          const ct = useLifeTransSameTime<T>(
             v.exiting,
             value as any,
             v.resolve,
-            value.timeout)!
-          return render(args, v)
+            value.timeout, args.ignore)!
+          return render(!v.enterIgnore ? ct : undefined, v)
         }}
       />
     }}
   />
 }
 
-
 export type TAnimateValue<T> = {
-  //只创建(新增)
-  from: T
-  show: T,
-  willExit?: never
-  exit?: never
-} | {
-  //只销毁,告知销毁,并配送销毁参数
-  from?: never
-  show?: never
+  //创建与销毁的配置.在销毁时仍然生效
+  from?: T
+  show?: T,
   willExit?: T
-  exit: T
+  exit?: T
 }
 
 export function OneTAnimate<T>(
@@ -95,8 +82,10 @@ export function OneTAnimate<T>(
   }: {
     onAnimateComplete?(): void,
     value: TAnimateValue<T>,
+    show?: any
+    ignore?: any
     render: (
-      args: T,
+      args: T | undefined,
       ext: {
         exiting?: boolean;
         promise: Promise<any>;
@@ -106,16 +95,17 @@ export function OneTAnimate<T>(
   },
 ) {
   return <OneExitAnimate
-    show={value.from}
     {...args}
     render={v => {
       return <HookRender
         key={v.key}
         render={() => {
-          const args = useBaseLifeTransSameTime<T>(
+          const ct = useBaseLifeTransSameTime<T>(
             v.exiting,
-            value as any)
-          return render(args, v)
+            value as any, {
+            disabled: args.ignore
+          })
+          return render(!v.enterIgnore ? ct : undefined, v)
         }}
       />
     }}

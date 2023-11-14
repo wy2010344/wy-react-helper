@@ -22,6 +22,9 @@ export type EditAction = {
   type: "undo"
 } | {
   type: "redo"
+} | {
+  type: "reset"
+  record: EditRecord
 }
 
 
@@ -89,6 +92,11 @@ function reducer(model: ContentEditableModel, action: EditAction): ContentEditab
         history: model.history
       }
     }
+  } else if (action.type == "reset") {
+    return {
+      currentIndex: 0,
+      history: [action.record],
+    };
   }
   return model
 }
@@ -109,6 +117,7 @@ export function useContentEditable<T>(t: T, initFun: (t: T) => ContentEditableMo
     dispatch,
     renderContentEditable(args: {
       readonly?: boolean
+      noFocus?: boolean
     }, renderContent: (ref: React.RefObject<HTMLElement>) => JSX.Element) {
       return <HookRender key={current.value} render={function () {
         const ref = useRef<HTMLElement>(null)
@@ -121,29 +130,30 @@ export function useContentEditable<T>(t: T, initFun: (t: T) => ContentEditableMo
           }
         }, [args.readonly])
         useEffect(() => {
-          requestAnimationFrame(function () {
-            const div = ref.current!
-            const selection = mb.DOM.setSelectionRange(div, { ...current.range })
-            div.scrollTop = current.scrollTop
-            div.scrollLeft = current.scrollLeft
-            // 获取光标位置
-            const range = selection.getRangeAt(0);
-            const rgag = range.endContainer == div ? div.lastElementChild : range
-            if (rgag) {
-              const rect = rgag.getBoundingClientRect()
-              // 如果光标位置超出可视区域，调整滚动位置
-              if (rect.bottom > div.clientHeight) {
-                div.scrollTop += rect.bottom - div.clientHeight;
-              } else if (rect.top < 0) {
-                div.scrollTop += rect.top;
-              }
-              if (rect.right > div.clientWidth) {
-                div.scrollLeft += rect.right - div.clientWidth;
-              } else if (rect.left < 0) {
-                div.scrollLeft += rect.left;
-              }
+          if (args.noFocus) {
+            return
+          }
+          const div = ref.current!
+          const selection = mb.DOM.setSelectionRange(div, { ...current.range })
+          div.scrollTop = current.scrollTop
+          div.scrollLeft = current.scrollLeft
+          // 获取光标位置
+          const range = selection.getRangeAt(0);
+          const rgag = range.endContainer == div ? div.lastElementChild : range
+          if (rgag) {
+            const rect = rgag.getBoundingClientRect()
+            // 如果光标位置超出可视区域，调整滚动位置
+            if (rect.bottom > div.clientHeight) {
+              div.scrollTop += rect.bottom - div.clientHeight;
+            } else if (rect.top < 0) {
+              div.scrollTop += rect.top;
             }
-          })
+            if (rect.right > div.clientWidth) {
+              div.scrollLeft += rect.right - div.clientWidth;
+            } else if (rect.left < 0) {
+              div.scrollLeft += rect.left;
+            }
+          }
         }, emptyArray)
         return renderContent(ref)
       }} />
@@ -152,23 +162,25 @@ export function useContentEditable<T>(t: T, initFun: (t: T) => ContentEditableMo
 }
 
 
-export function initContentEditableModel(content: string): ContentEditableModel {
+export function initRecord(content: string) {
+  return {
+    scrollLeft: 0,
+    scrollTop: 0,
+    range: {
+      start: content.length,
+      end: content.length,
+    },
+    value: content,
+  };
+}
+export function initContentEditableModel(
+  content: string
+): ContentEditableModel {
   return {
     currentIndex: 0,
-    history: [
-      {
-        scrollLeft: 0,
-        scrollTop: 0,
-        range: {
-          start: content.length,
-          end: content.length
-        },
-        value: content,
-      }
-    ]
-  }
+    history: [initRecord(content)],
+  };
 }
-
 
 
 export function getCurrentRecord(editor: HTMLElement): EditRecord {
