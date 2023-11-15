@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ReadOnlyRef } from "./useAlaways";
+import { emptyArray } from "./util";
 
 
 /**
@@ -22,6 +23,6 @@ export function useIsLaunchLock() {
   const ref = useRef(true)
   useEffect(() => {
     ref.current = false
-  }, [])
+  }, emptyArray)
   return ref.current
 }

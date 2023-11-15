@@ -59,7 +59,7 @@ export function OneTAnimateTime<T>(
             value as any,
             v.resolve,
             value.timeout, args.ignore)!
-          return render(!v.enterIgnore ? ct : undefined, v)
+          return render(ct, v)
         }}
       />
     }}
@@ -105,7 +105,7 @@ export function OneTAnimate<T>(
             value as any, {
             disabled: args.ignore
           })
-          return render(!v.enterIgnore ? ct : undefined, v)
+          return render(ct, v)
         }}
       />
     }}

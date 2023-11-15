@@ -1,5 +1,6 @@
 import { useEffect } from "react"
-import { emptyArray, useChange, useVersion } from "wy-react-helper"
+import { flushSync } from "react-dom"
+import { EmptyFun, emptyArray, useChange, useVersion } from "wy-react-helper"
 
 
 /**
@@ -25,7 +26,7 @@ export function useLifeTrans<T>(exiting: any, config: {
 }) {
   const [state, setState] = useChange(config.from)
   useEffect(() => {
-    requestAnimationFrame(function () {
+    requestAnimationState(function () {
       setState(config.show)
     })
   }, emptyArray)
@@ -47,12 +48,12 @@ export function useBaseLifeTransSameTime<T>(exiting: any, config: {
   disabled?: any
   didChange?: (exiting?: boolean) => void
 }) {
-  const [state, setState] = useChange<'show' | 'hide'>()
+  const [state, setState] = useChange<'show' | 'hide' | undefined>(ext?.disabled ? 'show' : undefined)
   useEffect(() => {
     if (ext?.disabled) {
       return
     }
-    requestAnimationFrame(function () {
+    requestAnimationState(function () {
       setState(exiting ? 'hide' : 'show')
       ext?.didChange?.(exiting)
     })
@@ -115,4 +116,9 @@ export function useLifeTransSameTime<T>(
     didChange: updateVersion,
     disabled
   })
+}
+
+
+function requestAnimationState(fun: EmptyFun) {
+  requestAnimationFrame(fun)
 }
