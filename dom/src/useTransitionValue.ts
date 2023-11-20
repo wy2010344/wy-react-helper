@@ -53,6 +53,10 @@ export function useBaseLifeTransSameTime<T>(exiting: any, config: {
     if (ext?.disabled) {
       return
     }
+    if (exiting && !config.willExit) {
+      ext?.didChange?.(exiting)
+      return
+    }
     requestAnimationState(function () {
       setState(exiting ? 'hide' : 'show')
       ext?.didChange?.(exiting)
@@ -66,7 +70,7 @@ export function useBaseLifeTransSameTime<T>(exiting: any, config: {
   }
   if (state == 'show') {
     if (exiting) {
-      return config.willExit || config.show
+      return config.willExit || config.exit
     }
     return config.show
   }
@@ -120,5 +124,6 @@ export function useLifeTransSameTime<T>(
 
 
 function requestAnimationState(fun: EmptyFun) {
+  // fun()
   requestAnimationFrame(fun)
 }
