@@ -26,3 +26,14 @@ export function useIsLaunchLock() {
   }, emptyArray)
   return ref.current
 }
+
+
+export function useOnceLock(value?: any) {
+  const ref = useRef(value)
+  useEffect(() => {
+    if (value) {
+      ref.current = false
+    }
+  }, [!value])
+  return ref.current
+}

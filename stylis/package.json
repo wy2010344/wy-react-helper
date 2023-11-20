@@ -48,7 +48,7 @@
   ],
   "dependencies": {
     "stylis": "^4.3.0",
-    "wy-react-helper": "file:.yalc/wy-react-helper"
+    "wy-react-helper": "^0.0.4"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^10.0.2",

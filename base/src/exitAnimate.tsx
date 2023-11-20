@@ -28,28 +28,23 @@ interface ExitModelImpl<V> extends ExitModel<V> {
  * 主要是有一点,可能会回退
  */
 export type ExitAnimateMode = 'pop' | 'shift' | 'wait'
-export function ExitAnimate<V>(
-  { list,
-    getKey,
-    mode,
-    exitIgnore,
-    enterIgnore,
-    onExitComplete,
-    onEnterComplete,
-    onAnimateComplete,
-    render,
-  }: {
-    list: readonly V[],
-    getKey(v: V): any
-    mode?: ExitAnimateMode
-    exitIgnore?(v: V): any
-    enterIgnore?(v: V): boolean
-    onExitComplete?(): void
-    onEnterComplete?(): void
-    onAnimateComplete?(): void
-    render: (v: ExitModel<V>) => React.ReactNode
-  }
-) {
+
+
+export function useExitAnimate<V>(list: readonly V[], getKey: (v: V) => any, {
+  mode,
+  exitIgnore,
+  enterIgnore,
+  onExitComplete,
+  onEnterComplete,
+  onAnimateComplete,
+}: {
+  mode?: ExitAnimateMode
+  exitIgnore?(v: V): any
+  enterIgnore?(v: V): boolean
+  onExitComplete?(v?: any): void
+  onEnterComplete?(v?: any): void
+  onAnimateComplete?(v?: any): void
+}): ExitModel<V>[] {
   //用于删除后强制刷新
   const [_, updateVersion] = useVersion()
   //每次render进来,合并cacheList
@@ -172,7 +167,29 @@ export function ExitAnimate<V>(
       }
     }
   })
-  return <>{newCacheList.get().filter(getNotHide).map(value => {
+
+  return newCacheList.get().filter(getNotHide)
+}
+
+export function ExitAnimate<V>(
+  { list,
+    getKey,
+    render,
+    ...args
+  }: {
+    list: readonly V[],
+    getKey(v: V): any
+    mode?: ExitAnimateMode
+    exitIgnore?(v: V): any
+    enterIgnore?(v: V): any
+    onExitComplete?(): void
+    onEnterComplete?(): void
+    onAnimateComplete?(): void
+    render: (v: ExitModel<V>) => React.ReactNode
+  }
+) {
+  const outList = useExitAnimate(list, getKey, args)
+  return <>{outList.map(value => {
     return render(value)
   })}</>
 }
