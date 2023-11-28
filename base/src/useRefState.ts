@@ -7,7 +7,7 @@ type RefState<T> = [T, (v: T) => void, ReadOnlyRef<T>]
 export function useRefState<T, M>(init: M, trans: (v: M) => T): RefState<T>
 export function useRefState<T>(init: T): RefState<T>
 export function useRefState() {
-  const [init, trans] = arguments[1]
+  const [init, trans] = arguments
   const [state, setState] = useChange(init, trans)
   const lock = useRef(state)
   const setValue = useCallback((value) => {

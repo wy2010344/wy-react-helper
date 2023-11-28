@@ -1,6 +1,7 @@
 
 export * from './SharePortal'
 export * from './ShareStore'
+export * from './SharePop'
 export * from './useOnlyId'
 export * from './ValueCenter'
 export * from './HookRender'
