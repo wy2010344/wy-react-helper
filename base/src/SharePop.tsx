@@ -1,14 +1,17 @@
 import React from "react";
 import { useStoreTriggerRender, valueCenterOf } from "./ValueCenter";
+import { getOutResolvePromise } from "./util";
 
 
 function initSharePop(): {
-  stacks: React.ReactNode[]
-  index: number
+  stacks: {
+    children: React.ReactNode
+    resolve(v: any): void
+  }[],
+  method?: 'push' | 'pop'
 } {
   return {
-    stacks: [],
-    index: -1
+    stacks: []
   }
 }
 /**
@@ -23,37 +26,29 @@ function initSharePop(): {
 export function createSharePop() {
   const popCenter = valueCenterOf(initSharePop())
   return {
-    Provider() {
-      const { stacks, index } = useStoreTriggerRender(popCenter)
-      return stacks[index]
+    useProvider() {
+      return useStoreTriggerRender(popCenter)
     },
-    push(element: React.ReactNode) {
-      const { stacks, index } = popCenter.get()
-      const newIndex = index + 1
+    push<T>(element: React.ReactNode) {
+      const { stacks } = popCenter.get()
+      const [promise, resolve] = getOutResolvePromise<T>()
       popCenter.set({
-        stacks: stacks.slice(0, index).concat(element),
-        index: newIndex
+        stacks: stacks.concat({
+          children: element,
+          resolve
+        }),
+        method: "push"
       })
+      return promise
     },
-    replace(element: React.ReactNode) {
-      const { stacks, index } = popCenter.get()
-      popCenter.set({
-        stacks: stacks.slice(0, index - 1).concat(element),
-        index
-      })
-    },
-    go(n: number) {
-      if (n != 0) {
-        const { stacks, index } = popCenter.get()
-        let newIndex = index + n
-        if (newIndex < 0) {
-          newIndex = 0
-        } else if (newIndex >= stacks.length) {
-          newIndex = stacks.length - 1
-        }
+    back(n?: any) {
+      const stacks = popCenter.get().stacks.slice()
+      const last = stacks.pop()
+      if (last) {
+        last.resolve(n)
         popCenter.set({
-          index: newIndex,
-          stacks
+          stacks,
+          method: "pop"
         })
       }
     }
