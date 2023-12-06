@@ -1,6 +1,5 @@
 import { useEffect } from "react"
-import { flushSync } from "react-dom"
-import { EmptyFun, emptyArray, useChange, useVersion } from "wy-react-helper"
+import { EmptyFun, emptyArray, run, useChange, useVersion } from "wy-react-helper"
 
 
 /**
@@ -42,18 +41,23 @@ export function useLifeTrans<T>(exiting: any, config: {
 export function useBaseLifeTransSameTime<T>(exiting: any, config: {
   from: T,
   show: T
-  willExit?: T
+  willExit?: T | boolean
   exit: T
 }, ext?: {
   disabled?: any
   didChange?: (exiting?: boolean) => void
 }) {
   const [state, setState] = useChange<'show' | 'hide' | undefined>(ext?.disabled ? 'show' : undefined)
+  const willExit = config.willExit
+    ? typeof config.willExit == 'boolean'
+      ? config.show
+      : config.willExit
+    : config.willExit
   useEffect(() => {
     if (ext?.disabled) {
       return
     }
-    if (exiting && !config.willExit) {
+    if (exiting && !willExit) {
       ext?.didChange?.(exiting)
       return
     }
@@ -70,7 +74,7 @@ export function useBaseLifeTransSameTime<T>(exiting: any, config: {
   }
   if (state == 'show') {
     if (exiting) {
-      return config.willExit || config.exit
+      return willExit || config.exit
     }
     return config.show
   }
@@ -108,7 +112,7 @@ export function useLifeTransSameTime<T>(
   config: {
     from: T,
     show: T
-    willExit?: T
+    willExit?: T | boolean
     exit: T
   },
   resolve: () => void,
@@ -123,7 +127,16 @@ export function useLifeTransSameTime<T>(
 }
 
 
+
 function requestAnimationState(fun: EmptyFun) {
-  // fun()
-  requestAnimationFrame(fun)
+  cacheList.push(fun)
+  if (cacheList.length == 1) {
+    requestAnimationFrame(function () {
+      cacheList.forEach(run)
+      cacheList.length = 0
+    })
+  }
 }
+
+
+const cacheList: EmptyFun[] = []

@@ -3,6 +3,8 @@ import { useChange } from "./useChange"
 import { useEvent } from "./useEvent"
 import { useVersionLock } from "./Lock"
 import { ReduceState } from "./ValueCenter"
+import { EmptyFun, createEmptyArray, emptyFun } from "./util"
+import { useRefConst, useRefConstWith } from "./useRefConst"
 
 export type PromiseResult<T> = {
   type: "success",
@@ -222,6 +224,50 @@ export function useMutationState<Req extends any[], Res>(effect: (...vs: Req) =>
   }), data] as const
 }
 
+export function useSerialRequestSingle<Req extends any[], Res>(
+  callback: (...vs: Req) => Promise<Res>,
+  effect: (res: PromiseResult<Res>) => void = emptyFun
+) {
+  const cacheList = useRefConst<Req[]>(createEmptyArray)
+  return function (...vs: Req) {
+    cacheList.push(vs)
+    if (cacheList.length == 1) {
+      //之前是空的
+      const checkRun = () => {
+        cacheList.shift()
+        if (cacheList.length) {
+          //如果有值,继续操作
+          circleRun()
+          return false
+        }
+        return true
+      }
+      const circleRun = () => {
+        while (cacheList.length > 1) {
+          cacheList.shift()
+        }
+        callback(...cacheList[0])
+          .then(res => {
+            if (checkRun()) {
+              effect({
+                type: "success",
+                value: res
+              })
+            }
+          })
+          .catch(err => {
+            if (checkRun()) {
+              effect({
+                type: "error",
+                value: err
+              })
+            }
+          })
+      }
+      circleRun()
+    }
+  }
+}
 /**
  * 串行的请求
  * @param callback 
@@ -232,7 +278,7 @@ export function useSerialRequest<Req extends any[], Res>(
   callback: (vs: Req, version: number, signal?: AbortSignal) => Promise<Res>,
   effect: (res: VersionPromiseResult<Res>, version: number) => void
 ) {
-  const lastCancelRef = useRef<(() => void) | undefined>(undefined)
+  const lastCancelRef = useRef<EmptyFun | undefined>(undefined)
   const [versionLock, updateVersion] = useVersionLock();
   return [
     function (...vs: Req) {

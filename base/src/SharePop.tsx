@@ -29,6 +29,9 @@ export function createSharePop() {
     useProvider() {
       return useStoreTriggerRender(popCenter)
     },
+    size() {
+      return popCenter.get().stacks.length
+    },
     push<T>(element: React.ReactNode) {
       const { stacks } = popCenter.get()
       const [promise, resolve] = getOutResolvePromise<T>()

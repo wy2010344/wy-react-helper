@@ -182,6 +182,10 @@ export function createUseReducerFun<A, M>(
   }
 }
 
+export function run<T>(fun: (...vs: any[]) => T) {
+  return fun()
+}
+
 
 
 
