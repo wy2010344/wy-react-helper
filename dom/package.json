@@ -59,6 +59,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "wy-react-helper": "^0.0.4"
+    "wy-react-helper": "file:.yalc/wy-react-helper"
   }
 }
