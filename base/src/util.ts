@@ -197,7 +197,9 @@ export class ArrayHelper<V>{
   ) {
     this.array = _array as V[]
   }
-
+  isDirty() {
+    return this.dirty
+  }
   get(): readonly V[] {
     return this.array
   }
@@ -219,7 +221,16 @@ export class ArrayHelper<V>{
     this.safeCopy()
     this.array[n] = v
   }
-
+  forEach(fun: (v: V, i: number) => void) {
+    for (let i = 0; i < this.array.length; i++) {
+      fun(this.array[i], i)
+    }
+  }
+  forEachRight(fun: (v: V, i: number) => void) {
+    for (let i = this.array.length - 1; i > -1; i--) {
+      fun(this.array[i], i)
+    }
+  }
   removeWhere(fun: (v: V, i: number) => any) {
     let count = 0
     for (let i = this.array.length - 1; i > -1; i--) {

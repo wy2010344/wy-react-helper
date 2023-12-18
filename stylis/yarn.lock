@@ -7018,10 +7018,10 @@ ws@^7.0.0:
   resolved "https://registry.npmjs.org/ws/-/ws-7.5.9.tgz"
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
 
-wy-react-helper@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.npmjs.org/wy-react-helper/-/wy-react-helper-0.0.4.tgz"
-  integrity sha512-VbX4Uag7Ozim/2AVzRPSm3vlfM8VPY0qBET7VqoiRpe0JVaBY+rJc4BVMfp5kRxVyNd4Ue5rlEb2EEW50CHBKQ==
+wy-react-helper@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.npmjs.org/wy-react-helper/-/wy-react-helper-0.0.6.tgz"
+  integrity sha512-JNQ6vp3q98hsblGBJPvZxcGjKr7R92YOHQcVIvxOFF6rFYMGVhy79o1PBVBFmb13zAR7upiJH6qR8ino2lGF3g==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

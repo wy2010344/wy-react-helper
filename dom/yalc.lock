@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "wy-react-helper": {
-      "signature": "7220a3a719d2465ae22e823e5440d60a",
+      "signature": "4726ead9287b3841e2bda96b08bc57a0",
       "file": true,
       "replaced": "^0.0.4"
     }
