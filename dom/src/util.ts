@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react"
-import { emptyArray } from "wy-react-helper"
+import { emptyArray, quote } from "wy-react-helper"
 
 
 export function createScript(
@@ -63,6 +63,18 @@ export function cns(...vs: (string | null | undefined | boolean)[]) {
   return vs.filter((v) => v).join(" ");
 }
 
+
+export function getTrim(v: string) {
+  return v.trim()
+}
+/**
+ * 先就简单这么分割吧,如果文字还\n,\t,会以之分割并中断
+ * @param names 
+ * @returns 
+ */
+export function splitClassNames(names: string) {
+  return new Set(names.split(' ').map(getTrim).filter(quote))
+}
 
 export function useGetUrl(file: File | Blob) {
   const url = useMemo(() => {
