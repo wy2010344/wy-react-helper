@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
-import { useStoreTriggerRender, useValueCenterWith } from './ValueCenter'
+import { useValueCenterWith } from './ValueCenter'
+import { useStoreTriggerRender } from './useStoreTriggerRender'
 
 /**
  * 返回组件

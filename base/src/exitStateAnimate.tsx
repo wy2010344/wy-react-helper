@@ -1,5 +1,6 @@
-import { useEffect, useReducer, useRef } from "react";
-import { ArrayHelper, EmptyFun, createUseReducer, emptyArray, getOutResolvePromise } from "./util";
+import { useEffect, useRef } from "react";
+import { ArrayHelper, EmptyFun, emptyArray, getOutResolvePromise } from "wy-helper";
+import { createUseReducer } from "./util";
 
 
 type DirectionState = 'enter' | 'exit'

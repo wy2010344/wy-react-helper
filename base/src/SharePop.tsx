@@ -1,6 +1,6 @@
 import React from "react";
-import { useStoreTriggerRender, valueCenterOf } from "./ValueCenter";
-import { getOutResolvePromise } from "./util";
+import { getOutResolvePromise, valueCenterOf } from "wy-helper";
+import { useStoreTriggerRender } from "./useStoreTriggerRender";
 
 
 function initSharePop(): {

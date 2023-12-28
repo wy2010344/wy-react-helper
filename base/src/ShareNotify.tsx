@@ -1,7 +1,8 @@
 import React from "react";
 import { HookRender } from "./HookRender";
 import { getOnlyId } from "./useOnlyId";
-import { useStoreTriggerRender, useValueCenterWith, ValueCenter, valueCenterOf } from "./ValueCenter";
+import { useStoreTriggerRender } from "./useStoreTriggerRender";
+import { valueCenterOf } from "wy-helper";
 
 
 

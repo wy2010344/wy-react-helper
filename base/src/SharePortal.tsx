@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from "react"
-import { useOnlyId } from "./useOnlyId"
-import { ValueCenter, useStoreTriggerRender, useValueCenterWith, valueCenterOf } from "./ValueCenter"
+import { useValueCenterWith } from "./ValueCenter"
 import { HookRender } from "./HookRender";
+import { ValueCenter } from "wy-helper";
+import { useStoreTriggerRender } from "./useStoreTriggerRender";
 const map = new Map();
 let uid = 1;
 function getId(key: any) {

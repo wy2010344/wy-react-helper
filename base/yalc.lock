@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "wy-helper": {
+      "signature": "e95fc587e02eb805c605ccc9b4935190",
+      "file": true
+    }
+  }
+}
