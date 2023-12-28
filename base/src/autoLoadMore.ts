@@ -3,7 +3,7 @@ import { useEvent } from "./useEvent"
 import { PromiseResult, createAndFlushAbortController } from "./usePromise"
 import { useAlaways } from "./useAlaways"
 import { useVersionLock } from "./Lock"
-import { emptyFun } from "./util"
+import { emptyFun } from "wy-helper"
 export type LoadAfterResult<T, K> = {
   list: T[];
   nextKey: K;

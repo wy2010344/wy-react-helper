@@ -1,5 +1,5 @@
 import { useRefConst } from "./useRefConst";
-import { notEqualChange, ShouldChange, valueOf } from "./Vue";
+import { notEqualChange, ShouldChange, valueOf } from "wy-helper/Vue";
 
 
 

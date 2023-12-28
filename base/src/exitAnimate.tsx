@@ -1,6 +1,6 @@
 
 import { useVersion } from "./useVersion"
-import { ArrayHelper, createEmptyArray, emptyArray, getOutResolvePromise } from "./util"
+import { ArrayHelper, createEmptyArray, emptyArray, getOutResolvePromise } from "wy-helper"
 import { useRefFun } from "./useRefConst"
 import React, { useEffect } from "react"
 

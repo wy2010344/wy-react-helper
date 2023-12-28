@@ -1,5 +1,4 @@
-import { ValueCenter } from "./ValueCenter"
-
+import { ValueCenter } from "wy-helper"
 
 interface StringBridge<T> {
   toString(v: T): string

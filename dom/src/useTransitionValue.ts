@@ -1,6 +1,7 @@
 import { useEffect } from "react"
-import { EmptyFun, run, useChange } from "wy-react-helper"
-import { splitClassNames } from "./util"
+import { useChange } from "wy-react-helper"
+import { EmptyFun, run } from "wy-helper"
+import { forceFlow, forceFlowClassNames, forceFlowInitClassNames, requestBatchAnimationFrame, splitClassNames } from "wy-dom-helper"
 
 type Getter<T> = (...vs: any[]) => T
 /**
@@ -20,15 +21,6 @@ type Getter<T> = (...vs: any[]) => T
  * 因此动画结束,可能需要删除造成动画的样式
  * 然后手动设置样式
  */
-export function forceFlow(div: Element | null | undefined) {
-  //强制回流
-  if (div) {
-    const scrollTop = div.scrollTop
-    div.scrollTop = scrollTop
-    return scrollTop
-  }
-}
-
 export function useInitClassNames(
   ref: () => Element,
   initCls: string,
@@ -39,36 +31,6 @@ export function useInitClassNames(
     show: showCls
   }
   return useTriggerClassNames(ref, false, value, value)
-}
-/**
- * 强制进行动画
- * @param div 
- * @param classNames 
- */
-export function forceFlowClassNames(div: Element, classNames: string) {
-  const list = splitClassNames(classNames)
-  list.forEach(row => div.classList.remove(row))
-  forceFlow(div)
-  list.forEach(row => div.classList.add(row))
-  return classNames
-}
-export function forceFlowInitClassNames(div: Element, initCls: string, showCls: string) {
-  const inits = splitClassNames(initCls)
-  const shows = splitClassNames(showCls)
-  shows.forEach(function (fc) {
-    div.classList.remove(fc)
-  })
-  inits.forEach(function (tc) {
-    div.classList.add(tc)
-  })
-  forceFlow(div)
-  inits.forEach(function (tc) {
-    div.classList.remove(tc)
-  })
-  shows.forEach(function (fc) {
-    div.classList.add(fc)
-  })
-  return showCls
 }
 
 export function useTriggerClassNames(
@@ -229,7 +191,7 @@ export function useLifeState(
 }
 
 
-function subscribeTimeout(callback: EmptyFun, time: number) {
+export function subscribeTimeout(callback: EmptyFun, time: number) {
   /**
    * 需要取消订阅,因为开发者模式useEffect执行多次,不取消会造成问题
    */
@@ -310,16 +272,3 @@ export function getLifeState<T>(model: LiftStateModel<T>, state: LifeTransState)
   }
   return model['enter']
 }
-
-export function requestBatchAnimationFrame(fun: EmptyFun) {
-  cacheList.push(fun)
-  if (cacheList.length == 1) {
-    requestAnimationFrame(function () {
-      cacheList.forEach(run)
-      cacheList.length = 0
-    })
-  }
-}
-
-
-const cacheList: EmptyFun[] = []

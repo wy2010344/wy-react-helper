@@ -1,18 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useChange } from "./useChange"
 import { useEvent } from "./useEvent"
 import { useVersionLock } from "./Lock"
-import { ReduceState } from "./ValueCenter"
-import { EmptyFun, createEmptyArray, emptyFun } from "./util"
-import { useRefConst, useRefConstWith } from "./useRefConst"
+import { EmptyFun, createEmptyArray, emptyFun, ReduceState, PromiseResult, buildSerialRequestSingle } from "wy-helper"
+import { useRefConst } from "./useRefConst"
 
-export type PromiseResult<T> = {
-  type: "success",
-  value: T
-} | {
-  type: "error",
-  value: any
-}
 export type PromiseResultSuccessValue<T> = T extends {
   type: "success"
   value: infer V
@@ -224,49 +216,13 @@ export function useMutationState<Req extends any[], Res>(effect: (...vs: Req) =>
   }), data] as const
 }
 
+
 export function useSerialRequestSingle<Req extends any[], Res>(
   callback: (...vs: Req) => Promise<Res>,
   effect: (res: PromiseResult<Res>) => void = emptyFun
 ) {
   const cacheList = useRefConst<Req[]>(createEmptyArray)
-  return function (...vs: Req) {
-    cacheList.push(vs)
-    if (cacheList.length == 1) {
-      //之前是空的
-      const checkRun = () => {
-        cacheList.shift()
-        if (cacheList.length) {
-          //如果有值,继续操作
-          circleRun()
-          return false
-        }
-        return true
-      }
-      const circleRun = () => {
-        while (cacheList.length > 1) {
-          cacheList.shift()
-        }
-        callback(...cacheList[0])
-          .then(res => {
-            if (checkRun()) {
-              effect({
-                type: "success",
-                value: res
-              })
-            }
-          })
-          .catch(err => {
-            if (checkRun()) {
-              effect({
-                type: "error",
-                value: err
-              })
-            }
-          })
-      }
-      circleRun()
-    }
-  }
+  return buildSerialRequestSingle(callback, effect, cacheList)
 }
 /**
  * 串行的请求

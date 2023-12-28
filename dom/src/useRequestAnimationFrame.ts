@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { EmptyFun, emptyArray, useEvent } from "wy-react-helper";
+import { EmptyFun, emptyArray } from "wy-helper";
+import { useEvent } from "wy-react-helper";
 
 
 export function useRequesetAnimationFrame(run: EmptyFun) {
