@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PromiseResult, buildPromiseResultSetData, useSerialRequestLoading } from "./usePromise";
+import { useSerialRequestLoading } from "./usePromise";
 import { useChange } from "./useChange";
 import { useBuildSubSetObject } from "./util";
-import { emptyFun } from "wy-helper";
+import { PromiseResult, buildPromiseResultSetData, emptyFun } from "wy-helper";
 /**
  * 所有页数
  * @todo 移除直接修改状态,改为与外部进行合并

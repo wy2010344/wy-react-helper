@@ -32,7 +32,7 @@
   },
   "name": "wy-react-dom-helper",
   "author": "wyknmjj",
-  "module": "dist/dom.esm.js",
+  "module": "dist/wy-react-dom-helper.esm.js",
   "size-limit": [
     {
       "path": "dist/dom.cjs.production.min.js",
@@ -60,5 +60,10 @@
     "wy-dom-helper": "^0.1.0",
     "wy-helper": "^0.1.0",
     "wy-react-helper": "^0.0.8"
+  },
+  "dependencies": {
+    "wy-dom-helper": "file:.yalc/wy-dom-helper",
+    "wy-helper": "file:.yalc/wy-helper",
+    "wy-react-helper": "file:.yalc/wy-react-helper"
   }
 }

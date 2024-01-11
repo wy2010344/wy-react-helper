@@ -2,34 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useChange } from "./useChange"
 import { useEvent } from "./useEvent"
 import { useVersionLock } from "./Lock"
-import { EmptyFun, createEmptyArray, emptyFun, ReduceState, PromiseResult, buildSerialRequestSingle } from "wy-helper"
+import { EmptyFun, createEmptyArray, emptyFun, ReduceState, PromiseResult, buildSerialRequestSingle, createAbortController, GetPromiseRequest, OnVersionPromiseFinally, VersionPromiseResult, PromiseResultSuccessValue, buildPromiseResultSetData, OutPromiseOrFalse } from "wy-helper"
 import { useRefConst } from "./useRefConst"
-
-export type PromiseResultSuccessValue<T> = T extends {
-  type: "success"
-  value: infer V
-} ? V : never
-
-type VersionPromiseResult<Res> = PromiseResult<Res> & {
-  version: number
-}
-export type GetPromiseRequest<T> = (signal?: AbortSignal, ...vs: any[]) => Promise<T>;
-type OnFinally<T> = (data: VersionPromiseResult<T>, ...vs: any[]) => void;
-function createAbortController() {
-  if ("AbortController" in globalThis) {
-    const signal = new AbortController();
-    return {
-      signal: signal.signal,
-      cancel() {
-        signal.abort();
-      },
-    };
-  }
-  return {
-    signal: undefined,
-    cancel() { },
-  };
-}
 
 export function createAndFlushAbortController(ref: React.MutableRefObject<(() => void) | undefined>) {
   const controller = createAbortController()
@@ -40,11 +14,8 @@ export function createAndFlushAbortController(ref: React.MutableRefObject<(() =>
   ref.current = controller.cancel
   return controller.signal
 }
-
-export type FalseType = false | undefined | null | 0 | "" | void;
-type OutPromiseOrFalse<T> = GetPromiseRequest<T> | FalseType;
 export function useMemoPromiseCall<T, Deps extends readonly any[]>(
-  initOnFinally: OnFinally<T>,
+  initOnFinally: OnVersionPromiseFinally<T>,
   effect: () => OutPromiseOrFalse<T>,
   deps: Deps
 ) {
@@ -79,7 +50,7 @@ export function useMemoPromiseCall<T, Deps extends readonly any[]>(
 }
 export function useCallbackPromiseCall<T, Deps extends readonly any[]>(
   callback: GetPromiseRequest<T>,
-  onFinally: OnFinally<T>,
+  onFinally: OnVersionPromiseFinally<T>,
   deps: Deps
 ) {
   return useMemoPromiseCall(onFinally, () => callback, deps)
@@ -94,7 +65,7 @@ export function useCallbackPromiseCall<T, Deps extends readonly any[]>(
  */
 
 export function useBaseMemoPromiseState<T, Deps extends readonly any[] = any[]>(
-  onFinally: undefined | OnFinally<T>,
+  onFinally: undefined | OnVersionPromiseFinally<T>,
   effect: () => OutPromiseOrFalse<T>,
   deps: Deps
 ) {
@@ -122,26 +93,11 @@ export function useMemoPromiseState<T, Deps extends readonly any[]>(
   return useBaseMemoPromiseState(undefined, effect, deps)
 }
 
-export function buildPromiseResultSetData<F extends PromiseResult<any>>(
-  updateData: ReduceState<F | undefined>
-): ReduceState<PromiseResultSuccessValue<F>> {
-  return function setData(fun) {
-    updateData((old) => {
-      if (old?.type == "success") {
-        return {
-          ...old,
-          value: typeof fun == "function" ? (fun as any)(old.value) : fun,
-        };
-      }
-      return old;
-    });
-  };
-}
 export function useBaseCallbackPromiseState<
   T,
   Deps extends readonly any[] = any[]
 >(
-  onFinally: undefined | OnFinally<T>,
+  onFinally: undefined | OnVersionPromiseFinally<T>,
   effect: GetPromiseRequest<T>,
   deps: Deps
 ) {

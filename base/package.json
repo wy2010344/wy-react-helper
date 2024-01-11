@@ -34,7 +34,7 @@
   },
   "name": "wy-react-helper",
   "author": "wy2010344",
-  "module": "dist/react-helper.esm.js",
+  "module": "dist/wy-react-helper.esm.js",
   "size-limit": [
     {
       "path": "dist/react-helper.cjs.production.min.js",
@@ -60,5 +60,8 @@
   "peerDependencies": {
     "react": ">=16",
     "wy-helper": "^0.1.0"
+  },
+  "dependencies": {
+    "wy-helper": "file:.yalc/wy-helper"
   }
 }
