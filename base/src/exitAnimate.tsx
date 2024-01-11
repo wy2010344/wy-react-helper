@@ -1,6 +1,6 @@
 
 import { useVersion } from "./useVersion"
-import { ArrayHelper, createEmptyArray, emptyArray, getOutResolvePromise } from "wy-helper"
+import { ArrayHelper, createEmptyArray, emptyArray, emptyObject, getOutResolvePromise } from "wy-helper"
 import { useRefFun } from "./useRefConst"
 import React, { useEffect } from "react"
 
@@ -45,7 +45,7 @@ export function useExitAnimate<V>(list: readonly V[], getKey: (v: V) => any, {
   onExitComplete,
   onEnterComplete,
   onAnimateComplete,
-}: ExitAnimateArg<V>): ExitModel<V>[] {
+}: ExitAnimateArg<V> = emptyObject): ExitModel<V>[] {
   //用于删除后强制刷新
   const [_, updateVersion] = useVersion()
   //每次render进来,合并cacheList,因为有回滚与副作用,所以必须保持所有变量的无副作用

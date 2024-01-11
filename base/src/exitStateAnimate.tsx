@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { ArrayHelper, EmptyFun, emptyArray, getOutResolvePromise } from "wy-helper";
+import { ArrayHelper, EmptyFun, emptyArray, emptyObject, getOutResolvePromise } from "wy-helper";
 import { createUseReducer } from "./util";
+import { useExitAnimate } from "./exitAnimate";
 
 
 type DirectionState = 'enter' | 'exit'
@@ -56,7 +57,7 @@ export function useExitStateAnimate<V>(
     onEnterComplete?: EmptyFun
     onExitComplete?: EmptyFun
     onAnimationComplete?: EmptyFun
-  }
+  } = emptyObject
 ) {
   const lastRenderRef = useRef<readonly V[]>()
   const [cacheList, dispatch] = useCacheList(emptyArray as unknown as readonly CacheModel<V>[])
