@@ -198,6 +198,11 @@ export function useExitAnimate<V>(list: readonly V[], getKey: (v: V) => any, {
   return newCacheList.get().map(getHideAsShow).filter(getNotHide)
 }
 
+/**
+ * 有一个可以直接嵌入
+ * @param param0 
+ * @returns 
+ */
 export function ExitAnimate<V>(
   { list,
     getKey,
@@ -229,9 +234,8 @@ function getHideAsShow(v: ExitModelImpl<any>) {
   return v
 }
 
-const onlyArray = [1]
 function onlyGetArray(v: any) {
-  return v
+  return 1
 }
 function ignoreTrue() {
   return true
@@ -241,20 +245,20 @@ function ignoreTrue() {
  * 不处理替换,替换可能是各自配置,可能是push等
  * 主要是各自配置出入动画
  */
-export function OneExitAnimate(
+export function OneExitAnimate<T>(
   {
     show,
     ignore,
     ...args
   }: {
-    show?: any,
+    show?: T | undefined | null | false | void,
     ignore?: any
     onAnimateComplete?(): void,
-    render: (v: ExitModel<any>) => React.ReactNode
+    render: (v: ExitModel<T>) => React.ReactNode
   },
 ) {
-  return <ExitAnimate<any>
-    list={show ? onlyArray : emptyArray}
+  return <ExitAnimate<T>
+    list={show ? [show] : emptyArray}
     {...args}
     getKey={onlyGetArray}
     enterIgnore={show && ignore ? ignoreTrue : undefined}
