@@ -1,9 +1,9 @@
 import { Reducer, useCallback, useEffect, useReducer, useRef } from "react"
 import { useEvent } from "./useEvent"
-import { PromiseResult, createAndFlushAbortController } from "./usePromise"
+import { createAndFlushAbortController } from "./usePromise"
 import { useAlaways } from "./useAlaways"
 import { useVersionLock } from "./Lock"
-import { emptyFun } from "wy-helper"
+import { PromiseResult, emptyFun } from "wy-helper"
 export type LoadAfterResult<T, K> = {
   list: T[];
   nextKey: K;
