@@ -1,7 +1,7 @@
-import { } from "./ValueCenter"
-import { GetPromiseRequest, PromiseResult, createAndFlushAbortController } from "./usePromise"
+
+import { createAndFlushAbortController } from "./usePromise"
 import { useStoreTriggerRender } from "./useStoreTriggerRender"
-import { quote, valueCenterOf } from "wy-helper"
+import { GetPromiseRequest, PromiseResult, quote, valueCenterOf } from "wy-helper"
 
 
 
@@ -30,13 +30,11 @@ export function createResource<T>(getResource: GetPromiseRequest<T>) {
     promise = thePromise
   }
   function useFilter<M>(filter: (v?: PromiseResult<T>) => M) {
-    return useStoreTriggerRender(resource, {
-      filter,
-      onBind(a) {
-        if (!promise) {
-          reloadPromise()
-        }
-      },
+    return useStoreTriggerRender(resource, function (v) {
+      if (!promise) {
+        reloadPromise()
+      }
+      return filter(v)
     })
   }
   return {

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ArrayHelper, EmptyFun, emptyArray, emptyObject, getOutResolvePromise } from "wy-helper";
 import { createUseReducer } from "./util";
-import { useExitAnimate } from "./exitAnimate";
 
 
 type DirectionState = 'enter' | 'exit'

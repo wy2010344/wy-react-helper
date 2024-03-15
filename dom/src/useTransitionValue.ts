@@ -1,9 +1,7 @@
 import { useEffect } from "react"
-import { useChange } from "wy-react-helper"
-import { EmptyFun, run } from "wy-helper"
-import { CSSProperties, forceFlow, forceFlowClassNames, forceFlowInitClassNames, forceFlowInitStyle, forceFlowStyle, mergeStyle, requestBatchAnimationFrame, splitClassNames } from "wy-dom-helper"
-
-type Getter<T> = (...vs: any[]) => T
+import { useAtom } from "wy-react-helper"
+import { EmptyFun, delay, emptyArray } from "wy-helper"
+import { CNSInfer, ClsWithStyle, GetRef, TriggerMConfig, effectCssAinmationFirst, effectCssAnimationOther } from "wy-dom-helper"
 /**
  * 这个模仿react-transition-group的并不科学
  * 过渡有准备动作?
@@ -21,229 +19,71 @@ type Getter<T> = (...vs: any[]) => T
  * 因此动画结束,可能需要删除造成动画的样式
  * 然后手动设置样式
  */
-export function useInitClassNames(
-  ref: () => Element,
-  initCls: string,
-  showCls: string,
-) {
-  return useTriggerClassNames(ref, false, {
-    willShow: initCls,
-    show: showCls,
-    exit: initCls
-  })
-}
 
-export function useTriggerClassNames(
-  ref: () => Element,
-  exiting: any,
-  config: {
-    willShow: string
-    show: string
-    willExit?: string
-    exit: string
-  },
-  effect?: () => void | EmptyFun
+
+export function useTriggerStyle<
+  T extends ElementCSSInlineStyle & Element,
+  M extends ClsWithStyle,
+  Dep extends readonly any[]
+>(
+  ref: GetRef<T>,
+  render: (deps: Dep) => TriggerMConfig<T, M>,
+  deps: Dep
 ) {
+  const cacheStyle = useAtom<[M, CNSInfer<M>]>(null as any)
   useEffect(() => {
-    const div = ref()
-    if (exiting) {
-      if (config.willExit) {
-        forceFlowInitClassNames(div, config.willExit, config.exit)
-      } else {
-        forceFlowClassNames(div, config.exit)
-      }
+    const out = render(deps)
+    if (cacheStyle.get()) {
+      return effectCssAnimationOther(ref, out, cacheStyle)
     } else {
-      forceFlowInitClassNames(div, config.willShow, config.show)
-    }
-    return effect?.()
-  }, [!exiting])
-  return exiting ? config.exit : config.show
-}
-
-export function useTriggerClassNamesWithShow(
-  ref: () => Element,
-  exiting: any,
-  config: {
-    willShow: string
-    show: string
-    willExit?: string
-    exit: string
-  },
-  resolve: EmptyFun,
-  timeout: number,
-  show?: string
-) {
-  const [state, setState] = useChange<string>()
-  const cls = useTriggerClassNames(ref, exiting, config, function () {
-    return subscribeTimeout(show ? function () {
-      resolve()
-      setState(show)
-    } : resolve, timeout)
-  })
-  if (exiting) {
-    return cls
-  } else {
-    return state || cls
-  }
-}
-export type TriggerStyleConfig = {
-  willShow: CSSProperties
-  show: CSSProperties
-  showReplace?(div: ElementCSSInlineStyle & Element, style: CSSProperties): CSSProperties
-  willExit?: CSSProperties
-  willExitReplace?(div: ElementCSSInlineStyle & Element, style: CSSProperties): CSSProperties
-  exit: CSSProperties
-}
-export function useTriggerStyle(
-  ref: () => ElementCSSInlineStyle & Element,
-  exiting: any,
-  config: TriggerStyleConfig,
-  effect?: (exiting: any) => void
-) {
-  useEffect(() => {
-    const div = ref()
-    if (exiting) {
-      const replace = config.willExitReplace || config.showReplace
-      if (config.willExit || replace) {
-        forceFlowInitStyle(div, config.willExit || config.show, config.exit, replace)
-      } else {
-        forceFlowStyle(div, config.exit)
-      }
-    } else {
-      const replaceShow = config.showReplace?.(div, config.show) || config.show
-      forceFlowInitStyle(div, config.willShow, replaceShow)
-    }
-    return effect?.(exiting)
-  }, [!exiting])
-  return exiting ? config.exit : config.show
-}
-
-export function useTriggerStyleWithShow(
-  ref: () => ElementCSSInlineStyle & Element,
-  exiting: any,
-  config: TriggerStyleConfig,
-  resolve: EmptyFun,
-  timeout: number,
-  show?: CSSProperties
-) {
-  const [state, setState] = useChange<CSSProperties>()
-  const cls = useTriggerStyle(ref, exiting, config, function (exiting) {
-    return subscribeTimeout(function () {
-      resolve()
-      if (!exiting && config.showReplace) {
-        mergeStyle(ref(), config.show)
-      }
-      if (show) {
-        setState(show)
-      }
-    }, timeout)
-  })
-  if (exiting) {
-    return cls
-  } else {
-    return state || cls
-  }
-}
-
-/*******
- * 元素的过度与动画有一点,可能有别的属性动画,会触发多次
- */
-export function useBindTransitionFinish(
-  ref: () => Element,
-  callback: EmptyFun,
-  deps?: readonly any[]
-) {
-  useEffect(function () {
-    const div = ref()
-    requestBatchAnimationFrame(function () {
-      div.addEventListener("transitionend", callback, {
-        once: true
-      })
-      div.addEventListener("transitioncancel", callback, {
-        once: true
-      })
-    })
-    return function () {
-      div.removeEventListener("transitionend", callback)
-      div.removeEventListener("transitioncancel", callback)
+      return effectCssAinmationFirst(ref, out, cacheStyle)
     }
   }, deps)
-}
-export function useBindAnimationFinish(
-  ref: () => Element,
-  callback: EmptyFun,
-  deps?: readonly any[]
-) {
-  useEffect(function () {
-    const div = ref()
-    requestBatchAnimationFrame(function () {
-      div.addEventListener("animationend", callback, {
-        once: true
-      })
-      div.addEventListener("animationcancel", callback, {
-        once: true
-      })
-    })
-    return function () {
-      div.removeEventListener("animationend", callback)
-      div.removeEventListener("animationcancel", callback)
-    }
-  }, deps)
+  return render(deps).target
 }
 
-export function useBindTimeoutFinish(exiting: any, resolve: EmptyFun, timeout: number) {
-  useEffect(() => {
-    return subscribeTimeout(resolve, timeout)
-  }, [!exiting])
-}
 /**
- * 需要exitDone,因为如果到时间仍未删除,需要exitDone占位
- */
-export type LifeTransState = "init" | "enter" | "show" | "willExit" | "exit"
-
-type LifeStateArg = {
-  ref?: Getter<Element | null | undefined>,
-  resolve?: EmptyFun,
-  disabled?: boolean
-  noShowChange?: boolean
-}
-const defaultLifeStateArg: LifeStateArg = {}
-/**
- * exiting默认是true.
- * @param exiting 
+ * 只做入场动画
  * @param ref 
- * @param resolve 
+ * @param init 
  * @returns 
  */
-export function useLifeState(
-  exiting: any,
-  arg: LifeStateArg = defaultLifeStateArg
+export function useTriggerStyleInit<
+  T extends ElementCSSInlineStyle & Element,
+  M extends ClsWithStyle
+>(
+  ref: GetRef<T>,
+  init: TriggerMConfig<T, M>
 ) {
-  const [state, setState] = useChange<LifeTransState>(arg.disabled ? 'show' : 'init')
   useEffect(() => {
-    if (exiting) {
-      setState('exit')
-    } else {
-      if (arg.disabled) {
-        return
-      }
-      setState('enter')
-    }
-    if (arg.ref) {
-      forceFlow(arg.ref())
-    }
-  }, [!exiting])
-  return [exiting && state != 'exit' ? 'willExit' : state, function () {
-    if (state == 'enter') {
-      if (arg.noShowChange || arg.disabled) {
-        return
-      }
-      setState('show')
-    }
-    arg.resolve?.()
-  }] as const
+    return effectCssAinmationFirst(ref, init)
+  }, emptyArray)
+  return init.target
 }
 
+export function getTimeoutPromise(time: number, then: EmptyFun) {
+  return function () {
+    return delay(time).then(then)
+  }
+}
+
+export function useTriggerStyleWithShow<
+  T extends ElementCSSInlineStyle & Element,
+  M extends ClsWithStyle
+>(
+  ref: GetRef<T>,
+  exiting: any,
+  init: TriggerMConfig<T, M>,
+  exit: TriggerMConfig<T, M>
+) {
+  return useTriggerStyle(ref, function () {
+    if (exiting) {
+      return exit
+    } else {
+      return init
+    }
+  }, [!exiting])
+}
 
 export function subscribeTimeout(callback: EmptyFun, time: number) {
   /**
@@ -253,76 +93,4 @@ export function subscribeTimeout(callback: EmptyFun, time: number) {
   return function () {
     clearTimeout(inv)
   }
-}
-
-
-export function useLifeStateTime(
-  exiting: any,
-  timeout: number | {
-    enter: number
-    exit: number
-  },
-  arg: LifeStateArg = defaultLifeStateArg
-) {
-  const [state, resolve] = useLifeState(exiting, arg)
-  useEffect(() => {
-    if (state == 'enter') {
-      return subscribeTimeout(resolve, typeof timeout == 'number' ? timeout : timeout.enter)
-    } else if (state == 'exit') {
-      return subscribeTimeout(resolve, typeof timeout == 'number' ? timeout : timeout.exit)
-    }
-  }, [state])
-  return state
-}
-
-export function useLifeStateTransition(
-  exiting: any,
-  arg: LifeStateArg = defaultLifeStateArg
-) {
-  const [state, resolve] = useLifeState(exiting, arg)
-  useEffect(() => {
-    const div = arg.ref?.()
-    if (div) {
-      if (state == 'enter' || state == 'exit') {
-        requestBatchAnimationFrame(function () {
-          //好像加个时延迟注册要靠谱一些,不然会被之前的动画冲掉
-          div.addEventListener("transitionend", resolve, {
-            once: true
-          })
-          div.addEventListener("transitioncancel", resolve, {
-            once: true
-          })
-        })
-        return function () {
-          div.removeEventListener("transitionend", resolve)
-          div.removeEventListener("transitioncancel", resolve)
-        }
-      }
-    }
-  }, [state])
-  return state
-}
-
-export type LiftStateModel<T> = {
-  init: T
-  enter: T
-  show?: T | boolean
-  willExit?: T | boolean
-  exit: T
-}
-
-export function getLifeState<T>(model: LiftStateModel<T>, state: LifeTransState) {
-  if (state == 'init' || state == 'enter' || state == 'exit') {
-    return model[state]
-  } else if (state == 'willExit') {
-    const v = model[state]
-    if (typeof v == 'string') {
-      return v
-    }
-  }
-  const v = model['show']
-  if (typeof v == 'string') {
-    return v
-  }
-  return model['enter']
 }
