@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { useChange } from "./useChange"
 import { useEvent } from "./useEvent"
 import { useVersionLock } from "./Lock"
-import { EmptyFun, createEmptyArray, emptyFun, ReduceState, PromiseResult, buildSerialRequestSingle, createAbortController, GetPromiseRequest, OnVersionPromiseFinally, VersionPromiseResult, PromiseResultSuccessValue, buildPromiseResultSetData, OutPromiseOrFalse } from "wy-helper"
+import { EmptyFun, createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, createAbortController, GetPromiseRequest, OnVersionPromiseFinally, VersionPromiseResult, buildPromiseResultSetData, OutPromiseOrFalse } from "wy-helper"
 import { useRefConst } from "./useRefConst"
 
 export function createAndFlushAbortController(ref: React.MutableRefObject<(() => void) | undefined>) {
@@ -14,6 +13,14 @@ export function createAndFlushAbortController(ref: React.MutableRefObject<(() =>
   ref.current = controller.cancel
   return controller.signal
 }
+
+/**
+ * 根据deps调用effect生成promise,在useEffect阶段调用promise,只有最后一个执行的才能触发initOnFinally
+ * @param initOnFinally 
+ * @param effect 
+ * @param deps 
+ * @returns 
+ */
 export function useMemoPromiseCall<T, Deps extends readonly any[]>(
   initOnFinally: OnVersionPromiseFinally<T>,
   effect: () => OutPromiseOrFalse<T>,
@@ -48,6 +55,14 @@ export function useMemoPromiseCall<T, Deps extends readonly any[]>(
   }, [version, request, onFinally])
   return mout
 }
+
+/**
+ * promise一定存在
+ * @param callback 
+ * @param onFinally 
+ * @param deps 
+ * @returns 
+ */
 export function useCallbackPromiseCall<T, Deps extends readonly any[]>(
   callback: GetPromiseRequest<T>,
   onFinally: OnVersionPromiseFinally<T>,
@@ -116,7 +131,7 @@ export function useCallbackPromiseState<T, Deps extends readonly any[]>(
   return useBaseCallbackPromiseState(undefined, effect, deps)
 }
 /**
- * 阻塞的请求
+ * 阻塞的请求,即如果正在进行,请求不进去
  * @param effect 
  * @returns 
  */
@@ -150,29 +165,13 @@ export function useMutationWithLoading<Req extends any[], Res>(effect: (...vs: R
     }
   }, loading] as const
 }
-
 /**
- * 阻塞的请求,并带有状态
+ * 阻塞的请求,中间的callback可能会丢弃掉.如果刚好完全处理完,会告知最后一次的effect
+ * 主要是处理异步set方法,set是覆盖性的.
+ * @param callback 
  * @param effect 
  * @returns 
  */
-export function useMutationState<Req extends any[], Res>(effect: (...vs: Req) => Promise<Res>) {
-  const [versionLock, updateVersionLock] = useVersionLock()
-  const [data, updateData] = useChange<VersionPromiseResult<Res>>()
-  return [useEvent(function (...vs: Req) {
-    if ((data?.version || 0) != versionLock.current) {
-      return
-    }
-    const version = updateVersionLock()
-    return effect(...vs).then(res => {
-      updateData({ type: "success", value: res, version })
-    }).catch(err => {
-      updateData({ type: "error", value: err, version })
-    })
-  }), data] as const
-}
-
-
 export function useSerialRequestSingle<Req extends any[], Res>(
   callback: (...vs: Req) => Promise<Res>,
   effect: (res: PromiseResult<Res>) => void = emptyFun
@@ -181,7 +180,7 @@ export function useSerialRequestSingle<Req extends any[], Res>(
   return buildSerialRequestSingle(callback, effect, cacheList)
 }
 /**
- * 串行的请求
+ * 每次都会处理,主要是保证effect处理最后一次请求
  * @param callback 
  * @param effect 
  * @returns 

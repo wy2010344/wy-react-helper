@@ -6583,10 +6583,10 @@ ws@^7.0.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.7.tgz#9e0ac77ee50af70d58326ecff7e85eb3fa375e67"
   integrity sha512-KMvVuFzpKBuiIXW3E4u3mySRO2/mCHSyZDJQM5NQ9Q9KHWHWh0NHgfbRMLLrceUK5qAL4ytALJbpRMjixFZh8A==
 
-wy-helper@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/wy-helper/-/wy-helper-0.1.0.tgz#0879645adc435efc8763f800d012935d21af8d6a"
-  integrity sha512-qOtCzlsiughd7uzIH8widouB4S1mzq/VTMqxHuOj4ZkTzJc0wM6NHAoqVf8bcvegRDOoay2oJveRGYG+6YrVRQ==
+wy-helper@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/wy-helper/-/wy-helper-0.1.2.tgz#2c8dcca904129a65b6491a4cbdb747d1515c42dc"
+  integrity sha512-wkUeJMtpMLsn68b/PnviE+sB6+csmTzlsCWxS/979PVTZhQQGJ/b9437tenjj9V9gLD9trRuo+4B9EenurVkWw==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

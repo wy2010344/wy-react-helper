@@ -1,6 +1,7 @@
 import { useReducer } from "react"
 import { useRefReducer } from "./useRefReducer"
-import { RWValue, initRWValue } from "wy-helper"
+import { GetValue, RWValue, SetValue, initRWValue, quote } from "wy-helper"
+import { ReducerFun } from "./util"
 
 
 type ReducerResult<T, M> = [T, (v: M) => void]
@@ -20,6 +21,26 @@ export function useChangeFun<T>(fun: () => T): ReducerResult<T, T> {
   return useChange(undefined, fun)
 }
 
+export function createUseRefValue<T, O, M = T>(
+  create: (get: GetValue<T>, set: SetValue<T>) => O,
+  init?: (a: M) => T
+) {
+  function initRef(
+    reducer: ReducerFun<T, T>,
+    value: T,
+    dispatch: (f: T) => void) {
+    function setValue(v: T) {
+      dispatch(v)
+      value = reducer(value, v)
+    }
+    return create(() => value, setValue)
+  }
+  const initF = (init || quote) as (a: M) => T
+  return function (initArg: M) {
+    return useRefReducer(initRef, change, initArg, initF)
+  }
+}
+
 
 type RefValueOut<T> = [T, RWValue<T>]
 export function useRefValue<T = undefined>(): RefValueOut<T | undefined>
@@ -31,10 +52,10 @@ export function useRefValue() {
 export function useRefValueFun<T>(fun: () => T): RefValueOut<T> {
   return useRefValue(undefined, fun)
 }
-
-function initRef<T>(value: T, callback: (f: T) => T) {
+function initRef<T>(reducer: ReducerFun<T, T>, value: T, dispatch: (f: T) => void) {
   function setValue(v: T) {
-    value = callback(v)
+    dispatch(v)
+    value = reducer(value, v)
   }
-  return initRWValue(setValue, () => value)
+  return initRWValue(() => value, setValue)
 }

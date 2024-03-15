@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
+import { emptyArray, storeRef } from "wy-helper";
 
 export function useRefConst<T>(fun: () => T) {
   return useRefFun(fun).current
@@ -15,4 +16,17 @@ export function useRefFun<T>(fun: () => T) {
     ref.current = fun()
   }
   return ref as React.MutableRefObject<T>
+}
+
+export function useAtomFun<T>(fun: () => T) {
+  return useMemo(() => {
+    return storeRef(fun())
+  }, emptyArray)
+}
+
+
+export function useAtom<T>(fun: T) {
+  return useMemo(() => {
+    return storeRef(fun)
+  }, emptyArray)
 }
