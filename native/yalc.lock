@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "packages": {
+    "wy-helper": {
+      "signature": "3922116d99bfb76e294ee32615690d09",
+      "file": true
+    },
+    "wy-react-helper": {
+      "signature": "87819087c0c491601edbbea16858caee",
+      "file": true
+    }
+  }
+}

@@ -1,6 +1,6 @@
 
 import { useVersion } from "./useVersion"
-import { alawaysTrue, createEmptyExitListCache, emptyArray, emptyObject, buildUseExitAnimate, ExitAnimateArg, ExitModel } from "wy-helper"
+import { alawaysTrue, createEmptyExitListCache, emptyArray, emptyObject, buildUseExitAnimate, ExitAnimateArg, ExitModel, FalseType } from "wy-helper"
 import { useAtomFun } from "./useRefConst"
 import React, { useEffect } from "react"
 import { HookRender } from "./HookRender"
@@ -69,4 +69,34 @@ export function OneExitAnimate<T>(
     enterIgnore={show && ignore ? alawaysTrue : undefined}
     exitIgnore={!show && ignore ? alawaysTrue : undefined}
   />
+}
+
+
+export function IfExitAnimate<T>({
+  show,
+  renderTrue,
+  other
+}: {
+  show: T,
+  renderTrue: (v: ExitModel<Exclude<T, FalseType>>) => JSX.Element,
+  other?: ExitAnimateArg<T> & {
+    renderFalse?(v: ExitModel<Extract<T, FalseType>>): JSX.Element
+  }
+}) {
+  return <ExitAnimate
+    list={show ? [show] : other?.renderFalse ? [show] : emptyArray}
+    getKey={renderIfGetKey}
+    {...other}
+    render={function (v) {
+      if (v.value) {
+        return renderTrue(v)
+      } else if (other?.renderFalse) {
+        return other.renderFalse(v)
+      }
+      return <></>
+    }} />
+}
+
+function renderIfGetKey<T>(v: T) {
+  return !v
 }
