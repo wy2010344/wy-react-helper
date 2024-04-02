@@ -1,6 +1,6 @@
 
 import { useVersion } from "./useVersion"
-import { alawaysTrue, createEmptyExitListCache, emptyArray, emptyObject, buildUseExitAnimate, ExitAnimateArg, ExitModel, FalseType } from "wy-helper"
+import { alawaysTrue, createEmptyExitListCache, emptyArray, emptyObject, buildUseExitAnimate, ExitAnimateArg, ExitModel, FalseType, quote } from "wy-helper"
 import { useAtomFun } from "./useRefConst"
 import React, { useEffect } from "react"
 import { HookRender } from "./HookRender"
@@ -46,28 +46,28 @@ export function renderExitAnimate<V>(list: readonly ExitModel<V>[], render: (row
 }
 
 /**
- * 只有一个元素的
- * 不处理替换,替换可能是各自配置,可能是push等
- * 主要是各自配置出入动画
+ * 只有一个元素的,只处理替换
  */
 export function OneExitAnimate<T>(
   {
-    show,
+    value,
+    getKey = quote,
     ignore,
     ...args
   }: {
-    show?: T | undefined | null | false | void,
+    value: T,
+    getKey?: (v: T) => any,
     ignore?: any
     onAnimateComplete?(): void,
     render: (v: ExitModel<T>) => JSX.Element
   },
 ) {
   return <ExitAnimate<T>
-    list={show ? [show] : emptyArray}
+    list={[value]}
     {...args}
-    getKey={alawaysTrue}
-    enterIgnore={show && ignore ? alawaysTrue : undefined}
-    exitIgnore={!show && ignore ? alawaysTrue : undefined}
+    getKey={getKey}
+    enterIgnore={ignore ? alawaysTrue : undefined}
+    exitIgnore={ignore ? alawaysTrue : undefined}
   />
 }
 
