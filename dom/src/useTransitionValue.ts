@@ -41,7 +41,6 @@ export function useTriggerStyle<
   }, deps)
   return render(deps).target
 }
-
 /**
  * 只做入场动画
  * @param ref 
