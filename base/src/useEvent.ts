@@ -1,6 +1,20 @@
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useAlaways } from "./useAlaways"
+import { emptyArray } from "wy-helper"
 
+function useBuildGet<T extends (...vs: any[]) => any>(get: React.RefObject<T>) {
+  return useCallback<T>(function (...vs) {
+    return get.current!(...vs)
+  } as T, emptyArray)
+}
+
+export function useEffectEvent<T extends (...vs: any[]) => any>(fun: T): T {
+  const value = useRef<T>()
+  useEffect(() => {
+    value.current = fun
+  })
+  return useBuildGet(value as any)
+}
 
 /**
  * 
