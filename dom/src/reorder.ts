@@ -1,26 +1,31 @@
 
 
 import { useReorder as useBaseReorder } from "wy-react-helper"
-import { getReorderOnScroll, reorderChildChangeIndex } from "wy-dom-helper"
-import { Box, EmptyFun, Point, ReorderChild, PointKey, emptyArray } from "wy-helper"
+import { getChangeOnScroll, reorderChildChangeIndex } from "wy-dom-helper"
+import { Box, EmptyFun, Point, ReorderChild, PointKey, emptyArray, ReadArray, emptyObject } from "wy-helper"
 import { useEffect, useMemo } from "react"
 
 
-export function useReorder(
-  axis: PointKey,
-  shouldRemove: (key: any) => boolean,
-  moveItem: (itemKey: any, baseKey: any) => void
+export function useReorder<T, K>(
+  list: ReadArray<T>,
+  getKey: (v: T) => K,
+  moveItem: (itemKey: any, baseKey: any) => void,
+  {
+    gap,
+    axis
+  }: {
+    gap?: number
+    axis?: PointKey,
+  } = emptyObject
 ) {
-  const rd = useBaseReorder(axis, shouldRemove, moveItem)
-
+  const rd = useBaseReorder(list, getKey, moveItem, axis, gap)
   const data = useMemo(() => {
     return {
       end: rd.end.bind(rd),
       move: rd.move.bind(rd),
-      onScroll: getReorderOnScroll(rd)
+      scroller: getChangeOnScroll(rd.setMoveDiff)
     }
   }, emptyArray)
-
   return {
     ...data,
     useChild(
