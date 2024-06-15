@@ -26,8 +26,10 @@ export function useSyncExternalStore<T>(subscribe: (callback: EmptyFun) => Empty
  * @param store
  * @param arg 只能初始化,中间不可以改变,即使改变,也是跟随的
  */
-export function useStoreTriggerRender<T, M>(store: ReadValueCenter<T>, filter: (a: T) => M): M;
-export function useStoreTriggerRender<T>(store: ReadValueCenter<T>, filter?: (a: T) => T): T;
+export function useStoreTriggerRender<T, M>(store: ReadValueCenter<T>,
+  filter: (a: T) => M): M;
+export function useStoreTriggerRender<T>(store: ReadValueCenter<T>,
+  filter?: (a: T) => T): T;
 export function useStoreTriggerRender<T>(store: ReadValueCenter<T>) {
   const filter = arguments[1] || quote
   const [state, setState] = useChangeFun(() => filter(store.get()))
