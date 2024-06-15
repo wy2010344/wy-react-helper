@@ -7,12 +7,12 @@
       "replaced": "^0.1.0"
     },
     "wy-helper": {
-      "signature": "456fc4ed40c31a5d006dd1660e2ce4ac",
+      "signature": "75f34517970270445aa568788744ce5d",
       "file": true,
       "replaced": "^0.1.2"
     },
     "wy-dom-helper": {
-      "signature": "8f94641a8a3970467dadbd6f9babb3e8",
+      "signature": "cf6743029128f1d0da7c8760edfa386c",
       "file": true,
       "replaced": "^0.1.2"
     }
