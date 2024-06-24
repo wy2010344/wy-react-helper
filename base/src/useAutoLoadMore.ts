@@ -51,16 +51,21 @@ export function useMemoAutoLoadMore<T, K>(
         })
       }
     },
+    updateData(callback: (old: T[]) => T[]) {
+      dispatch({
+        type: "update",
+        callback
+      })
+    },
     useWhenError(notify: (err: any, isMore?: boolean) => void) {
+      let error = ndata?.type == 'error' ? ndata.value : undefined
+      let loadMoreError = ndata?.type == 'success' ? ndata.value.loadMoreError : undefined
       useEffect(() => {
-        if (ndata?.type == 'error') {
-          notify(ndata.value)
-        } else if (ndata?.type == 'success') {
-          if (ndata.value.loadMoreError) {
-            notify(ndata.value.loadMoreError, true)
-          }
-        }
-      }, [ndata])
+        notify(error)
+      }, [error])
+      useEffect(() => {
+        notify(loadMoreError)
+      }, [loadMoreError])
     }
   }
 }

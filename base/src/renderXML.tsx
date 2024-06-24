@@ -32,7 +32,7 @@ const renderXML2RenderJoin = getRenderXMLFun<React.ReactNode>(function (vs) {
   return React.createElement(React.Fragment, {}, ...vs)
 })
 
-export function renderXML2Rc(value: string, def?: MapDefine<React.ReactNode>) {
+export function renderXML2Rc(value: string, def?: MapDefine<React.ReactNode>): React.ReactNode {
   if (def) {
     return renderXML2RenderJoin(value, mapToSingle(def))
   } else {
