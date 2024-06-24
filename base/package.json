@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -50,8 +50,6 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "husky": "^7.0.4",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "size-limit": "^7.0.8",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
@@ -59,9 +57,7 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "wy-helper": "^0.1.2"
+    "wy-helper": "^0.1.4"
   },
-  "dependencies": {
-    "wy-helper": "file:.yalc/wy-helper"
-  }
+  "dependencies": {}
 }
