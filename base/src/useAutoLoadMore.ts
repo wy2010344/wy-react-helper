@@ -15,7 +15,13 @@ type GetAfterEffect<T, K> = (
   signal?: AbortSignal
 ) => Promise<AutoLoadMoreCore<T, K>>;
 export function useMemoAutoLoadMore<T, K>(
-  initKey: K,
+  {
+    from,
+    getKey,
+  }: {
+    from: K,
+    getKey?(v: T): any
+  },
   body: GetAfterEffect<T, K>,
   deps: readonly any[]
 ) {
@@ -25,7 +31,8 @@ export function useMemoAutoLoadMore<T, K>(
     dispatch({
       type: "reload",
       getAfter: body,
-      first: initKey
+      first: from,
+      getKey
     })
   }, deps)
   const cdata = data.data
@@ -55,6 +62,12 @@ export function useMemoAutoLoadMore<T, K>(
       dispatch({
         type: "update",
         callback
+      })
+    },
+    refresh(call: (abort?: AbortSignal) => Promise<AutoLoadMoreCore<T, K>>) {
+      dispatch({
+        type: "refersh",
+        call
       })
     },
     useWhenError(notify: (err: any, isMore?: boolean) => void) {
