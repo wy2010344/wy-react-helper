@@ -10,7 +10,10 @@ export * from './useContentEditable'
 export * from './util'
 export * from './reorder'
 export * from './useClickOutside'
-
+export * from './br/util'
+export * from './br/dom'
+export * from './br/svg'
+export * from './br/attr'
 
 export function useAnimateFrame(value: number) {
   return useMemo(() => animateFrame(value), emptyArray)
