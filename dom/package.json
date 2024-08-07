@@ -60,5 +60,9 @@
     "wy-helper": "^0.1.4",
     "wy-react-helper": "^0.1.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "wy-dom-helper": "file:.yalc/wy-dom-helper",
+    "wy-helper": "file:.yalc/wy-helper",
+    "wy-react-helper": "file:.yalc/wy-react-helper"
+  }
 }

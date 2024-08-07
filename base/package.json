@@ -59,5 +59,7 @@
     "react": ">=16",
     "wy-helper": "^0.1.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "wy-helper": "file:.yalc/wy-helper"
+  }
 }
