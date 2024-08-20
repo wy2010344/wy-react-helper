@@ -1,5 +1,5 @@
 {
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -7,6 +7,11 @@
     "dist",
     "src"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wy2010344/wy-react-helper.git",
+    "directory": "base"
+  },
   "engines": {
     "node": ">=10"
   },
@@ -57,7 +62,7 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "wy-helper": "^0.1.5"
+    "wy-helper": "^0.1.6"
   },
   "dependencies": {
     "wy-helper": "file:.yalc/wy-helper"

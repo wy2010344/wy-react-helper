@@ -1,5 +1,5 @@
 {
-  "version": "0.1.8",
+  "version": "0.1.9",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -9,6 +9,11 @@
   ],
   "engines": {
     "node": ">=10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wy2010344/wy-react-helper.git",
+    "directory": "dom"
   },
   "scripts": {
     "start": "tsdx watch",
@@ -56,13 +61,9 @@
   "peerDependencies": {
     "react": ">=16",
     "react-dom": ">=16",
-    "wy-dom-helper": "^0.1.5",
-    "wy-helper": "^0.1.4",
-    "wy-react-helper": "^0.1.2"
+    "wy-dom-helper": "^0.1.6",
+    "wy-helper": "^0.1.6",
+    "wy-react-helper": "^0.1.5"
   },
-  "dependencies": {
-    "wy-dom-helper": "file:.yalc/wy-dom-helper",
-    "wy-helper": "file:.yalc/wy-helper",
-    "wy-react-helper": "file:.yalc/wy-react-helper"
-  }
+  "dependencies": {}
 }

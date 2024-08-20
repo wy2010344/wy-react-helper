@@ -1,135 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import { useEvent } from "./useEvent"
+import { useRef, useState } from "react"
 import { useVersionLock } from "./Lock"
-import { EmptyFun, createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, createAbortController, GetPromiseRequest, OnVersionPromiseFinally, VersionPromiseResult, buildPromiseResultSetData, OutPromiseOrFalse } from "wy-helper"
+import { createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, VersionPromiseResult, createAndFlushAbortController } from "wy-helper"
 import { useRefConst } from "./useRefConst"
-
-export function createAndFlushAbortController(ref: React.MutableRefObject<(() => void) | undefined>) {
-  const controller = createAbortController()
-  const last = ref.current
-  if (last) {
-    last()
-  }
-  ref.current = controller.cancel
-  return controller.signal
-}
-
-/**
- * 根据deps调用effect生成promise,在useEffect阶段调用promise,只有最后一个执行的才能触发initOnFinally
- * @param initOnFinally 
- * @param effect 
- * @param deps 
- * @returns 
- */
-export function useMemoPromiseCall<T, Deps extends readonly any[]>(
-  initOnFinally: OnVersionPromiseFinally<T>,
-  effect: () => OutPromiseOrFalse<T>,
-  deps: Deps
-) {
-  const versonRef = useRef(0);
-  const mout = useMemo(() => {
-    return {
-      version: versonRef.current++,
-      request: effect()
-    }
-  }, deps)
-  const {
-    version,
-    request
-  } = mout
-  const onFinally = useEvent(function (data: VersionPromiseResult<T>) {
-    if (version == data.version) {
-      initOnFinally(data)
-    }
-  })
-  useEffect(() => {
-    if (request) {
-      const signal = createAbortController();
-      request(signal.signal).then(data => {
-        onFinally({ type: "success", value: data, version })
-      }).catch(err => {
-        onFinally({ type: "error", value: err, version })
-      })
-      return signal.cancel
-    }
-  }, [version, request, onFinally])
-  return mout
-}
-
-/**
- * promise一定存在
- * @param callback 
- * @param onFinally 
- * @param deps 
- * @returns 
- */
-export function useCallbackPromiseCall<T, Deps extends readonly any[]>(
-  callback: GetPromiseRequest<T>,
-  onFinally: OnVersionPromiseFinally<T>,
-  deps: Deps
-) {
-  return useMemoPromiseCall(onFinally, () => callback, deps)
-}
-
-/**
- * 内部状态似乎不应该允许修改
- * 后面可以使用memo合并差异项
- * @param param0
- * @param deps
- * @returns [生效的数据,是否在loading]
- */
-
-export function useBaseMemoPromiseState<T, Deps extends readonly any[] = any[]>(
-  onFinally: undefined | OnVersionPromiseFinally<T>,
-  effect: () => OutPromiseOrFalse<T>,
-  deps: Deps
-) {
-  const [data, updateData] = useState<VersionPromiseResult<T>>();
-  const { version, request } = useMemoPromiseCall(
-    (data) => {
-      onFinally?.(data);
-      updateData(data);
-    },
-    effect,
-    deps
-  );
-  const outData = request ? data : undefined;
-  return {
-    data: outData,
-    version,
-    loading: outData?.version != version,
-    setData: buildPromiseResultSetData(updateData),
-  };
-}
-export function useMemoPromiseState<T, Deps extends readonly any[]>(
-  effect: () => OutPromiseOrFalse<T>,
-  deps: Deps
-) {
-  return useBaseMemoPromiseState(undefined, effect, deps)
-}
-
-export function useBaseCallbackPromiseState<
-  T,
-  Deps extends readonly any[] = any[]
->(
-  onFinally: undefined | OnVersionPromiseFinally<T>,
-  effect: GetPromiseRequest<T>,
-  deps: Deps
-) {
-  return useBaseMemoPromiseState(onFinally, () => effect, deps)
-}
-/**
- * 常用的根据依赖返回异步状态
- * @param effect 
- * @param deps 
- * @returns 
- */
-export function useCallbackPromiseState<T, Deps extends readonly any[]>(
-  effect: GetPromiseRequest<T>,
-  deps: Deps
-) {
-  return useBaseCallbackPromiseState(undefined, effect, deps)
-}
 /**
  * 阻塞的请求,即如果正在进行,请求不进去
  * @param effect 
@@ -185,16 +57,16 @@ export function useSerialRequestSingle<Req extends any[], Res>(
  * @param effect 
  * @returns 
  */
-export function useSerialRequest<Req extends any[], Res>(
+export function useLatestRequest<Req extends any[], Res>(
   callback: (vs: Req, version: number, signal?: AbortSignal) => Promise<Res>,
   effect: (res: VersionPromiseResult<Res>, version: number) => void
 ) {
-  const lastCancelRef = useRef<EmptyFun | undefined>(undefined)
+  const flushAbort = useRefConst(createAndFlushAbortController)
   const [versionLock, updateVersion] = useVersionLock();
   return [
     function (...vs: Req) {
       const version = updateVersion();
-      return callback(vs, version, createAndFlushAbortController(lastCancelRef))
+      return callback(vs, version, flushAbort())
         .then((data) => {
           if (version == versionLock.current) {
             effect({
@@ -225,13 +97,13 @@ export function useSerialRequest<Req extends any[], Res>(
  * @param effect
  * @returns
  */
-export function useSerialRequestLoading<Req extends any[], Res>(
+export function useLatestRequestLoading<Req extends any[], Res>(
   callback: (vs: Req, signal?: AbortSignal) => Promise<Res>,
   effect: (res: VersionPromiseResult<Res>) => void
 ) {
   const [reqVersion, setReqVersion] = useState(0);
   const [resVersion, setResVersion] = useState(0);
-  const [request, updateVersion] = useSerialRequest(
+  const [request, updateVersion] = useLatestRequest(
     function (args: Req, v, signal) {
       setReqVersion(v);
       return callback(args, signal);
@@ -252,7 +124,7 @@ function buildRefreshPromise<T>(shouldNotify: (a: T, old: T) => boolean) {
       notify(): void;
     }>();
     return {
-      request: useEvent(function (updateVersion: () => void) {
+      request(updateVersion: () => void) {
         return new Promise((resolve) => {
           updateVersion();
           refreshFlag.current = {
@@ -263,7 +135,7 @@ function buildRefreshPromise<T>(shouldNotify: (a: T, old: T) => boolean) {
             },
           };
         });
-      }),
+      },
       notify(getPromise: T) {
         if (refreshFlag.current) {
           if (shouldNotify(getPromise, refreshFlag.current.getPromise)) {
