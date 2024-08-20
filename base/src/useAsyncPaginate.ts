@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSerialRequestLoading } from "./usePromise";
+import { useLatestRequestLoading } from "./usePromise";
 import { useChange } from "./useChange";
 import { useBuildSubSetObject } from "./util";
 import { PromiseResult, buildPromiseResultSetData, emptyFun } from "wy-helper";
@@ -27,7 +27,7 @@ function useBaseAsyncPaginate<T, K>(
   deps: readonly any[]
 ) {
   const [page, setPage] = useChange(initKey);
-  const [request, loading] = useSerialRequestLoading(
+  const [request, loading] = useLatestRequestLoading(
     async function (
       [page]: [K],
       signal?: AbortSignal
