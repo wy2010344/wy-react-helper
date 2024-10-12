@@ -1,5 +1,5 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.6",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -62,7 +62,7 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "wy-helper": "^0.1.6"
+    "wy-helper": "^0.1.7"
   },
   "dependencies": {
     "wy-helper": "file:.yalc/wy-helper"
