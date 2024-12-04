@@ -1,15 +1,15 @@
 
 import { useEffect, useMemo } from "react";
-import { cacheSignal, Compare, emptyArray, genTemplateStringS2, GetValue, SetValue, Signal, simpleNotEqual, SyncFun, trackSignal, VType } from "wy-helper";
-import { useRefValueFun } from "./useChange";
+import { Compare, createSignal, emptyArray, genTemplateStringS2, GetValue, memo, SetValue, simpleNotEqual, SyncFun, trackSignalMemo, VType } from "wy-helper";
+import { useChange, useRefValueFun } from "./useChange";
 import { useConstDep, useConstFrom } from "./useRef";
 
 export function useSignal<T>(n: T, shouldChange: Compare<T> = simpleNotEqual) {
-  return useConstFrom(() => Signal(n, shouldChange))
+  return useConstFrom(() => createSignal(n, shouldChange))
 }
 
 export function useSignalFrom<T>(n: () => T, shouldChange: Compare<T> = simpleNotEqual) {
-  return useConstFrom(() => Signal(n(), shouldChange))
+  return useConstFrom(() => createSignal(n(), shouldChange))
 }
 /**
  * 动态依赖改变
@@ -17,10 +17,8 @@ export function useSignalFrom<T>(n: () => T, shouldChange: Compare<T> = simpleNo
  * @param deps 
  * @returns 
  */
-export function useComputedDep<T>(fun: GetValue<T>, deps?: any) {
-  const [get, des] = useMemo(() => cacheSignal(fun), deps)
-  useEffect(() => des, deps)
-  return get
+export function useSignalMemoDep<T>(fun: GetValue<T>, deps?: any) {
+  return useMemo(() => memo(fun), deps)
 }
 /**
  * 优化中间计算的缓存,其实一般不存在
@@ -28,8 +26,8 @@ export function useComputedDep<T>(fun: GetValue<T>, deps?: any) {
  * @param deps 
  * @returns 
  */
-export function useComputed<T>(fun: GetValue<T>) {
-  return useComputedDep(fun, emptyArray)
+export function useSignalMemo<T>(fun: GetValue<T>) {
+  return useSignalMemoDep(fun, emptyArray)
 }
 /**
  * get与shouldChange只使用第一次
@@ -41,7 +39,7 @@ export function useSignalState<T>(get: GetValue<T>, shouldChange: Compare<T> = s
   const [a, ref] = useRefValueFun(get)
   useEffect(() => {
     //有可能重复设置?
-    return trackSignal(get, v => {
+    return trackSignalMemo(get, v => {
       if (shouldChange(v, ref.get())) {
         ref.set(v)
       }
@@ -52,13 +50,13 @@ export function useSignalState<T>(get: GetValue<T>, shouldChange: Compare<T> = s
 
 export function useSignalEffect<T>(get: GetValue<T>, callback: SetValue<T>) {
   useEffect(() => {
-    return trackSignal(get, callback)
+    return trackSignalMemo(get, callback)
   }, emptyArray)
 }
 export function useSignalSyncDep<T>(get: GetValue<T>, dep?: any) {
   return useConstDep<SyncFun<T>>(function () {
     const [set, a, b, c] = arguments
-    return trackSignal(get, set, a, b, c)
+    return trackSignalMemo(get, set, a, b, c)
   }, dep)
 }
 export function useSignalSync<T>(get: GetValue<T>) {
@@ -70,3 +68,16 @@ export function useSignalSyncTemplate(ts: TemplateStringsArray, ...vs: VType[]) 
   }, vs)
 }
 
+
+
+export function SignalValue({
+  get
+}: {
+  get: GetValue<JSX.Element>
+}) {
+  const [v, setV] = useChange<JSX.Element>()
+  useEffect(() => {
+    return trackSignalMemo(get, setV)
+  }, emptyArray)
+  return v
+}

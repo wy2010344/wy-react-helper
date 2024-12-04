@@ -15,6 +15,7 @@ export * from './br/dom'
 export * from './br/svg'
 export * from './br/attr'
 export * from './useBigSpin'
+export * from './XDom'
 export function useAnimateFrame(value: number) {
   return useMemo(() => animateFrame(value), emptyArray)
 }

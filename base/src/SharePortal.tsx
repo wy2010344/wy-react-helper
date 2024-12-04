@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo } from "react"
-import { useValueCenterWith } from "./ValueCenter"
-import { HookRender } from "./HookRender";
-import { ValueCenter } from "wy-helper";
-import { useStoreTriggerRender } from "./useStoreTriggerRender";
+import React, { useEffect, useMemo } from 'react';
+import { useValueCenterWith } from './ValueCenter';
+import { HookRender } from './HookRender';
+import { ValueCenter } from 'wy-helper';
+import { useStoreTriggerRender } from './useStoreTriggerRender';
 const map = new Map();
 let uid = 1;
 function getId(key: any) {
@@ -23,7 +23,7 @@ export function renderSharePortal(store: ValueCenter<SharePortalModel>) {
           const list = useStoreTriggerRender(store);
           return (
             <>
-              {list.map((row) => {
+              {list.map(row => {
                 return (
                   <HookRender
                     key={getId(row)}
@@ -49,22 +49,23 @@ export function renderSharePortal(store: ValueCenter<SharePortalModel>) {
   }, [store]);
 }
 
-
 export function useCreateSharePortal() {
   const list = useValueCenterWith<SharePortalModel>([]);
   return {
     list,
     append(value: ValueCenter<JSX.Element>) {
-      const oldList = list.get().filter((v) => v != value);
+      const oldList = list.get().filter(v => v != value);
       list.set(oldList.concat(value));
-      return function () {
-        list.set(list.get().filter((v) => v != value));
-      }
-    }
+      return function() {
+        list.set(list.get().filter(v => v != value));
+      };
+    },
   };
 }
 
-export type SharePortalOperate = ReturnType<typeof useCreateSharePortal>["append"];
+export type SharePortalOperate = ReturnType<
+  typeof useCreateSharePortal
+>['append'];
 
 export function useAlawaysCenter(value: JSX.Element, deps?: readonly any[]) {
   const store = useValueCenterWith(value);
@@ -81,20 +82,19 @@ export function useAppendSharePop(
 ) {
   const rightPanel = useAlawaysCenter(value, deps);
   useEffect(() => {
-    return store(rightPanel)
+    return store(rightPanel);
   }, []);
 }
 
-
 export function useSharePortal() {
-  const { list, append } = useCreateSharePortal()
+  const { list, append } = useCreateSharePortal();
 
   return {
     render() {
-      renderSharePortal(list)
+      renderSharePortal(list);
     },
     useAppend(value: JSX.Element, deps?: readonly any[]) {
-      useAppendSharePop(append, value, deps)
+      useAppendSharePop(append, value, deps);
     },
-  }
+  };
 }
