@@ -1,10 +1,10 @@
-import { EmptyFun, emptyFun, emptyObject } from "wy-helper"
-import { afterFreeze, genTemplateString, lazyOrInit, TOrQuote } from "./util"
+import { EmptyFun, emptyFun, emptyObject, genTemplateStringS1 } from "wy-helper"
+import { afterFreeze, lazyOrInit, TOrQuote } from "./util"
 import React from "react"
-import { createPortal } from "react-dom"
-import { CSSProperties } from "wy-dom-helper"
 import { renderList, useAdd } from "wy-react-helper"
 export class DomCreater<M extends {}, T extends string> {
+  static instance = new DomCreater()
+  private constructor() { }
   /**
    * 其实这3个属性可以改变,
    * 因为只在最终render阶段释放.
@@ -14,25 +14,17 @@ export class DomCreater<M extends {}, T extends string> {
    * @param attrsEffect 
    * @param portal 
    */
-  constructor(
-    public readonly type: T
-  ) { }
-
+  public type!: T
   public attrsEffect: TOrQuote<M> = emptyObject as any
   attrs(v: TOrQuote<M>) {
     this.attrsEffect = v
     return this
   }
-  portal: Element | undefined
-  setPortal(n?: Element) {
-    this.portal = n
-    return this
-  }
   renderHtml(ts: TemplateStringsArray, ...vs: (string | number)[]) {
-    return this.renderInnerHTML(genTemplateString(ts, vs))
+    return this.renderInnerHTML(genTemplateStringS1(ts, vs))
   }
   renderText(ts: TemplateStringsArray, ...vs: (string | number)[]) {
-    return this.renderTextContent(genTemplateString(ts, vs))
+    return this.renderTextContent(genTemplateStringS1(ts, vs))
   }
   renderInnerHTML(innerHTML = '') {
     this.allRender(emptyFun, {
@@ -58,29 +50,11 @@ export class DomCreater<M extends {}, T extends string> {
       }
       props.dangerouslySetInnerHTML = dangerouslySetInnerHTML
     }
+    props.children = ctx
     afterFreeze(props)
-    let v: any = React.createElement(this.type as any, props, ...ctx)
-    if (this.portal) {
-      v = createPortal(v, this.portal)
-    }
-    useAdd(v)
+    useAdd(React.createElement(this.type as any, props))
   }
   render(fun = emptyFun) {
     return this.allRender(fun)
   }
-}
-
-
-type JKey = keyof JSX.IntrinsicElements
-type PropsS<K extends JKey> = JSX.IntrinsicElements[K] & {
-  style: CSSProperties
-}
-export function create<K extends JKey>(
-  type: K,
-  props?: JSX.IntrinsicElements[K] | ((v: PropsS<K>) => PropsS<K>),
-  portal?: Element
-) {
-  return new DomCreater<JSX.IntrinsicElements[K], K>(type)
-    .attrs(props || emptyObject as any)
-    .setPortal(portal)
 }

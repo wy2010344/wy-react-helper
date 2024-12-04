@@ -1,64 +1,83 @@
-import React from "react"
-import { Key } from "react"
-import { EmptyFun, emptyObject, objectFreeze } from "wy-helper"
+import React, { useEffect } from 'react';
+import { Key } from 'react';
+import { EmptyFun, emptyObject, objectFreeze, SetValue } from 'wy-helper';
+import { useChange } from './useChange';
 
 export function generateHook() {
-  return function HookRender({
-    render
-  }: {
-    render: () => JSX.Element
-  }) {
-    return render()
-  }
+  return function HookRender({ render }: { render: () => JSX.Element }) {
+    return render();
+  };
 }
-export const HookRender = generateHook()
+export const HookRender = generateHook();
 
-
-
-
-let globalCtx: any[] = []
+let globalCtx: any[] = [];
 function useCreate(ctx: any[]) {
-  const oldCtx = globalCtx
-  globalCtx = ctx
-  return oldCtx
+  const oldCtx = globalCtx;
+  globalCtx = ctx;
+  return oldCtx;
 }
 export function useAdd(v: any) {
-  globalCtx.push(v)
+  globalCtx.push(v);
 }
 function useFinish(oldCtx: any[]) {
-  globalCtx = oldCtx
+  globalCtx = oldCtx;
 }
 
 export function renderList(render: EmptyFun) {
-  const ctx: any[] = []
-  const old = useCreate(ctx)
-  render()
-  useFinish(old)
-  return objectFreeze(ctx)
+  const ctx: any[] = [];
+  const old = useCreate(ctx);
+  render();
+  useFinish(old);
+  return objectFreeze(ctx);
 }
-
 
 export function renderForEach(
   forEach: (callback: (key: Key, callback: EmptyFun) => void) => void
 ) {
-  return React.createElement(
-    React.Fragment,
-    emptyObject,
-    renderList(function () {
-      forEach(function (key, callback) {
-        useAdd(React.createElement(
-          React.Fragment,
-          { key },
-          renderList(callback)))
+  useAdd(
+    React.createElement(
+      React.Fragment,
+      emptyObject,
+      renderList(function() {
+        forEach(function(key, callback) {
+          useAdd(
+            React.createElement(React.Fragment, { key }, renderList(callback))
+          );
+        });
       })
-    }))
+    )
+  );
 }
 
-export function Br({
-  render
+export function Br({ render }: { render: EmptyFun }) {
+  const ctx = renderList(render);
+  return React.createElement(React.Fragment, emptyObject, ...ctx);
+}
+
+export function renderArray<T>(
+  array: readonly T[],
+  getKey: (v: T, i: number) => React.Key,
+  render: (v: T, i: number, key: React.Key) => void
+) {
+  renderForEach(function(forEach) {
+    for (let i = 0; i < array.length; i++) {
+      const v = array[i];
+      const key = getKey(v, i);
+      forEach(key, () => {
+        render(v, i, key);
+      });
+    }
+  });
+}
+
+export function SyncFun({
+  sync,
 }: {
-  render: EmptyFun
+  sync: (set: SetValue<React.ReactNode>) => EmptyFun;
 }) {
-  const ctx = renderList(render)
-  return React.createElement(React.Fragment, emptyObject, ...ctx)
+  const [v, setV] = useChange<React.ReactNode>();
+  useEffect(() => {
+    return sync(setV);
+  }, [sync]);
+  return v;
 }
