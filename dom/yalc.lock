@@ -1,20 +1,17 @@
 {
   "version": "v1",
   "packages": {
-    "wy-react-helper": {
-      "signature": "7a6267b50a6047d1c6258d63388254ef",
-      "file": true,
-      "replaced": "^0.1.0"
-    },
     "wy-helper": {
       "signature": "b109de72981fc311ad023ce0e2e5d2e9",
-      "file": true,
-      "replaced": "^0.1.2"
+      "file": true
     },
     "wy-dom-helper": {
-      "signature": "e10758f12d4313200f520cdff94b0e12",
-      "file": true,
-      "replaced": "^0.1.2"
+      "signature": "6c6533dba5db86c8a6dc41daa01d8bc8",
+      "file": true
+    },
+    "wy-react-helper": {
+      "signature": "7a6267b50a6047d1c6258d63388254ef",
+      "file": true
     }
   }
 }

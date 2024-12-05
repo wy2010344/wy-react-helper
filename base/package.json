@@ -1,8 +1,11 @@
 {
-  "version": "0.1.6",
-  "license": "MIT",
+  "name": "wy-react-helper",
+  "author": "wy2010344",
+  "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "version": "0.1.6",
+  "license": "MIT",
   "files": [
     "dist",
     "src"
@@ -12,59 +15,22 @@
     "url": "git+https://github.com/wy2010344/wy-react-helper.git",
     "directory": "base"
   },
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "ts": "tsc --noEmit --incremental",
-    "ts:watch": "yarn ts --watch",
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "name": "wy-react-helper",
-  "author": "wy2010344",
-  "module": "dist/wy-react-helper.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/react-helper.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/react-helper.esm.js",
-      "limit": "10 KB"
-    }
-  ],
-  "devDependencies": {
-    "@size-limit/preset-small-lib": "^7.0.8",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
-    "husky": "^7.0.4",
-    "size-limit": "^7.0.8",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "build": "tsc && vite build",
+    "prepare": "yarn build"
   },
   "peerDependencies": {
     "react": ">=16",
     "wy-helper": "^0.1.7"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1",
+    "vite-plugin-dts": "^4.3.0",
     "wy-helper": "file:.yalc/wy-helper"
   }
 }
