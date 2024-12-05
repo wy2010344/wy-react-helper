@@ -43,14 +43,13 @@ export class DomCreater<M extends {}, T extends string> {
       __html: string | TrustedHTML;
     }) {
     const ctx = renderList(fun)
-    let props = lazyOrInit(this.attrsEffect)
+    const props = lazyOrInit(this.attrsEffect) || {}
     if (dangerouslySetInnerHTML) {
-      if (!props) {
-        props = {}
-      }
       props.dangerouslySetInnerHTML = dangerouslySetInnerHTML
     }
-    props.children = ctx
+    if (ctx.length) {
+      props.children = ctx
+    }
     afterFreeze(props)
     useAdd(React.createElement(this.type as any, props))
   }

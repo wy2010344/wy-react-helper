@@ -1,71 +1,37 @@
 {
-  "version": "0.1.9",
-  "license": "MIT",
+  "name": "wy-react-dom-helper",
+  "author": "wy2010344",
+  "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "version": "0.1.9",
+  "license": "MIT",
   "files": [
     "dist",
     "src"
   ],
-  "engines": {
-    "node": ">=10"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wy2010344/wy-react-helper.git",
-    "directory": "dom"
+    "directory": "base"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "name": "wy-react-dom-helper",
-  "author": "wyknmjj",
-  "module": "dist/wy-react-dom-helper.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/dom.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/dom.esm.js",
-      "limit": "10 KB"
-    }
-  ],
-  "devDependencies": {
-    "@size-limit/preset-small-lib": "^10.0.2",
-    "@types/react": "^18.2.35",
-    "@types/react-dom": "^18.2.14",
-    "husky": "^8.0.3",
-    "size-limit": "^10.0.2",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2"
+    "build": "tsc && vite build",
+    "prepare": "yarn build"
   },
   "peerDependencies": {
     "react": ">=16",
-    "react-dom": ">=16",
-    "wy-dom-helper": "^0.1.6",
-    "wy-helper": "^0.1.6",
+    "wy-helper": "^0.1.7",
     "wy-react-helper": "^0.1.5"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1",
+    "vite-plugin-dts": "^4.3.0",
     "wy-dom-helper": "file:.yalc/wy-dom-helper",
     "wy-helper": "file:.yalc/wy-helper",
     "wy-react-helper": "file:.yalc/wy-react-helper"

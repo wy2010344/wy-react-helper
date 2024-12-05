@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { BDomEvent, DomElement, DomElementType, DomType, FChildAttr, FDomAttribute, isEvent, isSyncFun, mergeFNodeAttr, WithCenterMap } from "wy-dom-helper";
-import { emptyArray, EmptyFun, emptyObject } from "wy-helper";
-import { mergeRefs, ReactRef, renderList, useAdd, useConstFrom } from "wy-react-helper";
+import { EmptyFun, emptyObject } from "wy-helper";
+import { mergeRefs, ReactRef, renderList, useAdd } from "wy-react-helper";
 import { useKeep } from "../XDom";
 
 const ATTR_PREFIX = "a_"
@@ -11,6 +11,14 @@ const S_PREFIX = "s_"
 const CSS_PREFIX = "css_"
 
 const ignoreKeys = ['children', 'childrenType']
+
+function renderListSV(fun: EmptyFun) {
+  const ctx = renderList(fun)
+  if (ctx.length) {
+    return ctx
+  }
+  return undefined
+}
 function renderIt(type: string, args: any, ktag: DomType) {
   const ref = useRef(null)
   const list: ReactRef<any>[] = [ref]
@@ -21,9 +29,9 @@ function renderIt(type: string, args: any, ktag: DomType) {
     ref: mergeRefs(list),
     style: {}
   }
-  useKeep((oldAttrs, oldDes) => {
+  useKeep(props, args, ref, (oldAttrs, oldDes) => {
     return mergeFNodeAttr(ref.current!, args, oldAttrs, oldDes, ktag, true)
-  })
+  }, renderListSV)
   for (const key in args) {
     const value = (args as any)[key]
     const isSync = !isEvent(key) && isSyncFun(value)
@@ -40,29 +48,15 @@ function renderIt(type: string, args: any, ktag: DomType) {
         props.style[cssVariableKey] = value
       } else if (key.startsWith(DATA_PREFIX)) {
         const dataAttr = key.slice(DATA_PREFIX.length)
-        props.style[`data-${dataAttr}`] = value
+        props[`data-${dataAttr}`] = value
       } else if (key.startsWith(ARIA_PREFIX)) {
         const ariaKey = key.slice(ARIA_PREFIX.length)
-        props.style[`aria-${ariaKey}`] = value
+        props[`aria-${ariaKey}`] = value
       } else if (!ignoreKeys.includes(key)) {
         props[key] = value
       }
     }
   }
-
-  let ctx: readonly any[] = emptyArray
-  if (args.childrenType == 'html') {
-    props.dangerouslySetInnerHTML = {
-      __html: args.children
-    }
-  } else if (args.childrenType == 'text') {
-    ctx = [
-      args.children
-    ]
-  } else if (args.children) {
-    ctx = renderList(args.children)
-  }
-  props.children = ctx
   useAdd(React.createElement(type, props))
   return ref
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { BDomEvent, BSvgEvent, DomElementType, domTagNames, DomType, isEvent, isSyncFun, mergeXNodeAttr, Props, SvgElementType, WithCenterMap, XDomAttribute, XSvgAttribute } from "wy-dom-helper";
-import { createOrProxy, emptyArray, EmptyFun, emptyObject } from "wy-helper";
+import { createOrProxy, emptyArray, emptyFun, EmptyFun, emptyObject, Quote, quote, SyncFun } from "wy-helper";
 import { mergeRefs, useConstFrom } from "wy-react-helper";
 
 
@@ -8,17 +8,53 @@ import { mergeRefs, useConstFrom } from "wy-react-helper";
 
 
 function createSave() {
-  return {
-    des: {},
-    oldAttrs: emptyObject
-  } as {
-    des: Record<string, EmptyFun>,
-    oldAttrs: any
+  return new CreateSave()
+}
+type ContentType = "html" | "text"
+function updateContent(value: string, node: any, type: ContentType) {
+  if (type == 'html') {
+    node.innerHTML = value
+  } else {
+    node.textContent = value
   }
 }
+class CreateSave {
+  des: Record<string, EmptyFun> = {}
+  oldAttrs: any = emptyObject
 
+  private desContent: EmptyFun = emptyFun
+  private lastType: ContentType = undefined!
+  private lastContent: string | SyncFun<string> = ''
+
+  updateContent(
+    node: any,
+    type: ContentType,
+    content: string | SyncFun<string>
+  ) {
+    if (type == this.lastType && content == this.lastContent) {
+      return
+    }
+    this.lastType = type
+    this.lastContent = content
+    this.desContent()
+    if (isSyncFun(content)) {
+      this.desContent = content(updateContent, node, type)
+    } else {
+      this.desContent = emptyFun
+    }
+  }
+  destroy() {
+    for (const key in this.des) {
+      this.des[key]()
+    }
+  }
+}
 export function useKeep(
-  merge: (oldAttrs: Props, oldDes: any) => any
+  props: any,
+  args: any,
+  ref: React.RefObject<any>,
+  merge: (oldAttrs: Props, oldDes: any) => any,
+  toChildren: Quote<any> = quote
 ) {
   const keep = useConstFrom(createSave)
   useEffect(() => {
@@ -26,11 +62,41 @@ export function useKeep(
   })
   useEffect(() => {
     return () => {
-      for (const key in keep.des) {
-        keep.des[key]()
-      }
+      keep.destroy()
     }
   }, emptyArray)
+  if (args.childrenType == 'html') {
+    if (isSyncFun(args.children)) {
+      useEffect(() => {
+        keep.updateContent(
+          ref.current!,
+          "html",
+          args.children
+        )
+      })
+    } else {
+      props.dangerouslySetInnerHTML = {
+        __html: args.children
+      }
+    }
+  } else if (args.childrenType == 'text') {
+    if (isSyncFun(args.children)) {
+      useEffect(() => {
+        keep.updateContent(
+          ref.current!,
+          "text",
+          args.children
+        )
+      })
+    } else {
+      props.children = [
+        args.children
+      ]
+    }
+  } else if (args.children) {
+    props.children = toChildren(args.children)
+  }
+  return props
 }
 const ATTR_PREFIX = "a-"
 const S_PREFIX = "s-"
@@ -45,7 +111,7 @@ function create(tagNames: string[], type: DomType) {
         ref: mergeRefs([outRef, ref]),
         style: {}
       }
-      useKeep((oldAttrs, oldDes) => {
+      useKeep(props, args, ref, (oldAttrs, oldDes) => {
         return mergeXNodeAttr(ref.current!, args, oldAttrs, oldDes, type, true)
       })
       for (const key in args) {
@@ -66,14 +132,6 @@ function create(tagNames: string[], type: DomType) {
             props[key] = value
           }
         }
-      }
-
-      if (args.childrenType == 'html') {
-
-      } else if (args.childrenType == 'text') {
-
-      } else if (args.children) {
-        props.children = args.children
       }
       return React.createElement(tag, props)
     }) as any
