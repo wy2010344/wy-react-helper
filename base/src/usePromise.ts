@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { useVersionLock } from "./Lock"
-import { createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, VersionPromiseResult, createAndFlushAbortController } from "wy-helper"
+import { createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, VersionPromiseResult, createAndFlushAbortController, hookSetAbortSignal } from "wy-helper"
 import { useRefConst } from "./useRefConst"
 /**
  * 阻塞的请求,即如果正在进行,请求不进去
@@ -58,7 +58,7 @@ export function useSerialRequestSingle<Req extends any[], Res>(
  * @returns 
  */
 export function useLatestRequest<Req extends any[], Res>(
-  callback: (vs: Req, version: number, signal?: AbortSignal) => Promise<Res>,
+  callback: (vs: Req, version: number) => Promise<Res>,
   effect: (res: VersionPromiseResult<Res>, version: number) => void
 ) {
   const flushAbort = useRefConst(createAndFlushAbortController)
@@ -66,27 +66,28 @@ export function useLatestRequest<Req extends any[], Res>(
   return [
     function (...vs: Req) {
       const version = updateVersion();
-      return callback(vs, version, flushAbort())
-        .then((data) => {
-          if (version == versionLock.current) {
-            effect({
-              type: "success",
-              value: data,
-              version
-            }, version);
-            return true;
-          }
-        })
-        .catch((err) => {
-          if (version == versionLock.current) {
-            effect({
-              type: "error",
-              value: err,
-              version
-            }, version);
-            return false;
-          }
-        });
+      hookSetAbortSignal(flushAbort())
+      const p = callback(vs, version)
+      hookSetAbortSignal()
+      p.then((data) => {
+        if (version == versionLock.current) {
+          effect({
+            type: "success",
+            value: data,
+            version
+          }, version);
+          return true;
+        }
+      }).catch((err) => {
+        if (version == versionLock.current) {
+          effect({
+            type: "error",
+            value: err,
+            version
+          }, version);
+          return false;
+        }
+      });
     },
     updateVersion,
   ] as const;
@@ -98,15 +99,15 @@ export function useLatestRequest<Req extends any[], Res>(
  * @returns
  */
 export function useLatestRequestLoading<Req extends any[], Res>(
-  callback: (vs: Req, signal?: AbortSignal) => Promise<Res>,
+  callback: (vs: Req) => Promise<Res>,
   effect: (res: VersionPromiseResult<Res>) => void
 ) {
   const [reqVersion, setReqVersion] = useState(0);
   const [resVersion, setResVersion] = useState(0);
   const [request, updateVersion] = useLatestRequest(
-    function (args: Req, v, signal) {
+    function (args: Req, v) {
       setReqVersion(v);
-      return callback(args, signal);
+      return callback(args);
     },
     function (res, v) {
       setResVersion(v);

@@ -1,5 +1,5 @@
 import { AutoLoadMoreCore, VersionPromiseResult } from "wy-helper";
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { AutoLoadMoreAction, PromiseAutoLoadMore, ReadValueCenter, emptyArray, valueCenterAutoLoadMore } from 'wy-helper'
 import { useStoreTriggerRender } from "./useStoreTriggerRender";
 
@@ -11,22 +11,34 @@ export function useAutoLoadMoreValueCenter<T, K>() {
 }
 
 type GetAfterEffect<T, K> = (
-  key: K,
-  signal?: AbortSignal
+  key: K
 ) => Promise<AutoLoadMoreCore<T, K>>;
 export function useMemoAutoLoadMore<T, K>(
   {
     from,
     getKey,
+    onError
   }: {
     from: K,
     getKey?(v: T): any
+    onError?(err: any, loadMore?: boolean): void
   },
   body: GetAfterEffect<T, K>,
   deps: readonly any[]
 ) {
   const [center, dispatch] = useAutoLoadMoreValueCenter<T, K>()
-  const data = useStoreTriggerRender(center)
+  const filter = useCallback((t: PromiseAutoLoadMore<T, K>) => {
+    const cdata = t.data.data
+    if (cdata?.type == 'error') {
+      onError?.(cdata.value)
+    }
+    if (cdata?.type == 'success' && cdata.value.loadMoreError) {
+      onError?.(cdata.value.loadMoreError, true)
+    }
+    return t
+  }, emptyArray)
+  const data = useStoreTriggerRender(center, filter)
+
   useEffect(() => {
     dispatch({
       type: "reload",
@@ -64,21 +76,11 @@ export function useMemoAutoLoadMore<T, K>(
         callback
       })
     },
-    refresh(call: (abort?: AbortSignal) => Promise<AutoLoadMoreCore<T, K>>) {
+    refresh(call: () => Promise<AutoLoadMoreCore<T, K>>) {
       dispatch({
         type: "refersh",
         call
       })
-    },
-    useWhenError(notify: (err: any, isMore?: boolean) => void) {
-      let error = ndata?.type == 'error' ? ndata.value : undefined
-      let loadMoreError = ndata?.type == 'success' ? ndata.value.loadMoreError : undefined
-      useEffect(() => {
-        notify(error)
-      }, [error])
-      useEffect(() => {
-        notify(loadMoreError)
-      }, [loadMoreError])
     }
   }
 }
