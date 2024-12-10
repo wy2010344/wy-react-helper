@@ -14,7 +14,7 @@ export function getTotalPage(size: number, count: number) {
   return Math.ceil(count / size);
 }
 
-type GetPage<T, K> = (page: K, signal?: AbortSignal) => Promise<T>;
+type GetPage<T, K> = (page: K) => Promise<T>;
 
 type PromiseResultWithPage<T, K> = PromiseResult<T> & {
   page: K;
@@ -29,11 +29,10 @@ function useBaseAsyncPaginate<T, K>(
   const [page, setPage] = useChange(initKey);
   const [request, loading] = useLatestRequestLoading(
     async function (
-      [page]: [K],
-      signal?: AbortSignal
+      [page]: [K]
     ): Promise<PromiseResultWithPage<T, K>> {
       try {
-        const out = await getPage(page, signal);
+        const out = await getPage(page);
         return {
           type: "success",
           page,
