@@ -1,4 +1,4 @@
-import { buildPromiseResultSetData, createRequestPromise, FalseType, GetPromiseRequest, GetValue, RequestPromiseFinally, RequestPromiseResult, RequestVersionPromiseFinally, RequestVersionPromiseReulst } from "wy-helper";
+import { buildPromiseResultSetData, FalseType, GetPromiseRequest, GetValue, hookAbortSignalPromise, RequestPromiseFinally, RequestPromiseResult, RequestVersionPromiseFinally, RequestVersionPromiseReulst } from "wy-helper";
 import { useEvent } from "./useEvent";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -15,7 +15,13 @@ export function useRenderPromise<T>(
   })
   useEffect(() => {
     if (request) {
-      return createRequestPromise(request, onFinally)
+      const abortController = new AbortController()
+      hookAbortSignalPromise(abortController.signal, request, value => {
+        const v = value as RequestPromiseResult<T>
+        v.request = request
+        onFinally(v)
+      })
+      return abortController.abort.bind(abortController)
     }
   }, [request])
 }

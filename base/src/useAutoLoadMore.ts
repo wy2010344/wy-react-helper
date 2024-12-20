@@ -1,4 +1,4 @@
-import { AutoLoadMoreCore, VersionPromiseResult } from "wy-helper";
+import { AutoLoadMoreCore } from "wy-helper";
 import { useCallback, useEffect, useMemo } from 'react'
 import { AutoLoadMoreAction, PromiseAutoLoadMore, ReadValueCenter, emptyArray, valueCenterAutoLoadMore } from 'wy-helper'
 import { useStoreTriggerRender } from "./useStoreTriggerRender";
@@ -70,10 +70,10 @@ export function useMemoAutoLoadMore<T, K>(
         })
       }
     },
-    updateData(callback: (old: T[]) => T[]) {
+    updateData(callback: T[] | ((old: T[]) => T[])) {
       dispatch({
         type: "update",
-        callback
+        callback: typeof callback == 'function' ? callback : () => callback
       })
     },
     refresh(call: () => Promise<AutoLoadMoreCore<T, K>>) {
