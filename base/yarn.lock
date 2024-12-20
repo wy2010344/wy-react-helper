@@ -1228,10 +1228,10 @@ vscode-uri@^3.0.8:
   resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-3.0.8.tgz#1770938d3e72588659a172d0fd4642780083ff9f"
   integrity sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==
 
-wy-helper@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/wy-helper/-/wy-helper-0.1.9.tgz#062540a8fe779d8f1f1ef02184384ec7c1384a9b"
-  integrity sha512-bkIeIGgbHyNcE6conqRZZs6un233L9Ag/8VU2aW8gUNADGVXSno+pCr89KmgTzuzurRg36q9FVpniuL5Bi6wyw==
+wy-helper@^0.1.10:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/wy-helper/-/wy-helper-0.1.10.tgz#ca47e158ef53c5c90e1f7f74573b24692f8d5ffd"
+  integrity sha512-hs2LyGpvvNjHnaY5+2i1JSM+SMdDdGi7M4BIj5N4Np2yJhTHiPp7On4PzvPMjMDWKKSymcXkLSKOi7jFadZ8TQ==
 
 yallist@^3.0.2:
   version "3.1.1"

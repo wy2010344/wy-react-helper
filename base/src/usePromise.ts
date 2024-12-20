@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { useVersionLock } from "./Lock"
-import { createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, VersionPromiseResult, createAndFlushAbortController, hookSetAbortSignal } from "wy-helper"
+import { createEmptyArray, emptyFun, PromiseResult, buildSerialRequestSingle, VersionPromiseResult, createAndFlushAbortController, hookAbortSignalPromise, getOutResolvePromise } from "wy-helper"
 import { useRefConst } from "./useRefConst"
 /**
  * 阻塞的请求,即如果正在进行,请求不进去
@@ -66,28 +66,18 @@ export function useLatestRequest<Req extends any[], Res>(
   return [
     function (...vs: Req) {
       const version = updateVersion();
-      hookSetAbortSignal(flushAbort())
-      const p = callback(vs, version)
-      hookSetAbortSignal()
-      p.then((data) => {
+      const [promise, resolve] = getOutResolvePromise<boolean>()
+      hookAbortSignalPromise(flushAbort(resolve), () => callback(vs, version), value => {
         if (version == versionLock.current) {
-          effect({
-            type: "success",
-            value: data,
-            version
-          }, version);
-          return true;
+          const v = value as VersionPromiseResult<Res>
+          v.version = version
+          effect(v, version);
+          resolve(true)
+        } else {
+          resolve(false)
         }
-      }).catch((err) => {
-        if (version == versionLock.current) {
-          effect({
-            type: "error",
-            value: err,
-            version
-          }, version);
-          return false;
-        }
-      });
+      })
+      return promise
     },
     updateVersion,
   ] as const;
