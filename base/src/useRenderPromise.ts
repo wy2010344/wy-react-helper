@@ -10,6 +10,7 @@ export function useRenderPromise<T>(
 ) {
   const onFinally: RequestPromiseFinally<T> = useEvent(function (data) {
     if (request == data.request) {
+      //因为abort-signal自动控制了,所有中止后不会调用回来.
       initFinally(data)
     }
   })

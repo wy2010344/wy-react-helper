@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { BDomEvent, DomElement, DomElementType, DomType, FChildAttr, FDomAttribute, isEvent, isSyncFun, mergeFNodeAttr, WithCenterMap } from "wy-dom-helper";
-import { EmptyFun, emptyObject } from "wy-helper";
+import { BDomEvent, DomElement, DomElementType, DomType, FDomAttribute, isEvent, isSyncFun, mergeFNodeAttr, WithCenterMap } from "wy-dom-helper";
+import { EmptyFun, emptyObject, SetValue, SyncFun } from "wy-helper";
 import { mergeRefs, ReactRef, renderList, useAdd } from "wy-react-helper";
 import { useKeep } from "../XDom";
 
@@ -70,3 +70,14 @@ export function renderDom<T extends DomElementType>(
     } = emptyObject as any) {
   return renderIt(type, args, "dom")
 }
+type SyncOrFun<T> = T | SyncFun<T>
+type FChildAttr<T> = {
+  childrenType: "text";
+  children: SyncOrFun<number | string>;
+} | {
+  childrenType: "html";
+  children: SyncOrFun<number | string>;
+} | {
+  childrenType?: never;
+  children?: SetValue<T>;
+};
