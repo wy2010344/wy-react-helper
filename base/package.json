@@ -4,7 +4,7 @@
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "files": [
     "dist",
@@ -23,7 +23,7 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "wy-helper": "^0.1.10"
+    "wy-helper": "^0.1.12"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
@@ -32,7 +32,6 @@
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "~5.6.2",
     "vite": "^6.0.1",
-    "vite-plugin-dts": "^4.3.0",
-    "wy-helper": "^0.1.10"
+    "vite-plugin-dts": "^4.3.0"
   }
 }
