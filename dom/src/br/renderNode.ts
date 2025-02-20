@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { BDomEvent, DomElement, DomElementType, DomType, FDomAttribute, isEvent, isSyncFun, mergeFNodeAttr, WithCenterMap } from "wy-dom-helper";
+import { BDomEvent, DomElement, DomElementType, FMergeChildAttr, FDomAttribute, isEvent, isSyncFun, mergeFDomAttr, WithCenterMap } from "wy-dom-helper";
 import { EmptyFun, emptyObject, SetValue, SyncFun } from "wy-helper";
 import { mergeRefs, ReactRef, renderList, useAdd } from "wy-react-helper";
 import { useKeep } from "../XDom";
@@ -19,7 +19,7 @@ function renderListSV(fun: EmptyFun) {
   }
   return undefined
 }
-function renderIt(type: string, args: any, ktag: DomType) {
+function renderIt(type: string, args: any, merge: typeof mergeFDomAttr) {
   const ref = useRef(null)
   const list: ReactRef<any>[] = [ref]
   if (args.ref) {
@@ -30,7 +30,7 @@ function renderIt(type: string, args: any, ktag: DomType) {
     style: {}
   }
   useKeep(props, args, ref, (oldAttrs, oldDes) => {
-    return mergeFNodeAttr(ref.current!, args, oldAttrs, oldDes, ktag, true)
+    return merge(ref.current!, args, oldAttrs, oldDes, true)
   }, renderListSV)
   for (const key in args) {
     const value = (args as any)[key]
@@ -64,20 +64,9 @@ export function renderDom<T extends DomElementType>(
   type: T,
   args: WithCenterMap<FDomAttribute<T>>
     & BDomEvent<T>
-    & FChildAttr<React.RefObject<DomElement<T>>>
+    & FMergeChildAttr<React.RefObject<DomElement<T>>>
     & {
       ref?: React.Ref<DomElement<T>>
     } = emptyObject as any) {
-  return renderIt(type, args, "dom")
+  return renderIt(type, args, mergeFDomAttr)
 }
-type SyncOrFun<T> = T | SyncFun<T>
-type FChildAttr<T> = {
-  childrenType: "text";
-  children: SyncOrFun<number | string>;
-} | {
-  childrenType: "html";
-  children: SyncOrFun<number | string>;
-} | {
-  childrenType?: never;
-  children?: SetValue<T>;
-};
