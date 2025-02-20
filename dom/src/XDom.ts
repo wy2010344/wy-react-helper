@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { BDomEvent, BSvgEvent, DomElementType, domTagNames, DomType, isEvent, isSyncFun, mergeXNodeAttr, Props, SvgElementType, WithCenterMap, XDomAttribute, XSvgAttribute } from "wy-dom-helper";
+import { BDomEvent, BSvgEvent, DomElementType, domTagNames, DomType, isEvent, isSyncFun, mergeXDomAttr, mergeXSvgAttr, Props, SvgElementType, WithCenterMap, XDomAttribute, XSvgAttribute } from "wy-dom-helper";
 import { createOrProxy, emptyArray, emptyFun, EmptyFun, emptyObject, Quote, quote, SyncFun } from "wy-helper";
 import { mergeRefs, useConstFrom } from "wy-react-helper";
 
@@ -103,7 +103,7 @@ const S_PREFIX = "s-"
 const CSS_PREFIX = "css-"
 
 const ignoreKeys = ['children', 'childrenType']
-function create(tagNames: string[], type: DomType) {
+function create(tagNames: string[], merge: typeof mergeXDomAttr) {
   return createOrProxy(tagNames, function (tag) {
     return React.forwardRef(function (args: any, outRef) {
       const ref = useRef(null)
@@ -112,7 +112,7 @@ function create(tagNames: string[], type: DomType) {
         style: {}
       }
       useKeep(props, args, ref, (oldAttrs, oldDes) => {
-        return mergeXNodeAttr(ref.current!, args, oldAttrs, oldDes, type, true)
+        return merge(ref.current!, args, oldAttrs, oldDes, true)
       })
       for (const key in args) {
         const value = (args as any)[key]
@@ -146,7 +146,7 @@ export const Dom: {
           children?: React.ReactNode
         }): JSX.Element
   }
-} = create(domTagNames, 'dom')
+} = create(domTagNames, mergeXDomAttr)
 
 
 export const Svg: {
@@ -158,4 +158,4 @@ export const Svg: {
           children?: React.ReactNode
         }): JSX.Element
   }
-} = create(domTagNames, 'dom')
+} = create(domTagNames, mergeXSvgAttr)
