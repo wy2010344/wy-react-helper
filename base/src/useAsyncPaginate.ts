@@ -31,17 +31,20 @@ function useBaseAsyncPaginate<T, K>(
     async function (
       [page]: [K]
     ): Promise<PromiseResultWithPage<T, K>> {
+      const promise = getPage(page)
       try {
-        const out = await getPage(page);
+        const out = await promise;
         return {
           type: "success",
           page,
+          promise,
           value: out,
         };
       } catch (err) {
         return {
           type: "error",
           page,
+          promise,
           value: err,
         };
       }

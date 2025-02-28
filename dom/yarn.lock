@@ -1279,28 +1279,31 @@ vscode-uri@^3.0.8:
   resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-3.0.8.tgz#1770938d3e72588659a172d0fd4642780083ff9f"
   integrity sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==
 
-wy-dom-helper@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/wy-dom-helper/-/wy-dom-helper-0.1.10.tgz#ab0c136588a2d631c3eff9857cb5f99a8b7a79d4"
-  integrity sha512-7NQj12UXqI7GmM1bpDiJRhpo/7JXY6JmBr3jBe2mpm0si6xpi07OJgAMiboSPW4RJ/0tsIaApx/s84SVehKyBQ==
+wy-dom-helper@^0.1.11:
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/wy-dom-helper/-/wy-dom-helper-0.1.11.tgz#c942c61004f06819010d9a48123f3f48d51707c6"
+  integrity sha512-Ag3+OBTmCc8JgQFgZip8c4G1x93mAtKLqPUDN/mxiR/KtWlXh3p/NI6MGhqbhHLTcQE5fbNk04nXkFWwyp7TMQ==
   dependencies:
     csstype "^3.1.3"
     linebreak "^1.1.0"
     stylis "^4.3.1"
+    wy-helper "^0.1.13"
 
-wy-helper@^0.1.12:
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/wy-helper/-/wy-helper-0.1.12.tgz#340073d06174718a8ad1a8d7cd04065bd93f66fa"
-  integrity sha512-laWTDL8vubZAuw6nB88nEGPAI6G+RRUmITae247NT14Sgxp4lV2c5tbxHHjZN4m+jkfXX07RH0gwB7OP2gEUcA==
+wy-helper@^0.1.13:
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/wy-helper/-/wy-helper-0.1.13.tgz#003730a950487f6d3fdd78b02004c4124bda7102"
+  integrity sha512-fnqkbSkIruygLn1ZArkll6752JkJ6xQOmgQvcIL1cyqKIAzkNkv43mChhUEEY3Pmr9xbK2onp1JZKl+kcRMO6g==
   dependencies:
     d3-binarytree "^1.0.2"
     d3-octree "^1.1.0"
     d3-quadtree "^3.0.1"
 
-wy-react-helper@^0.1.11:
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/wy-react-helper/-/wy-react-helper-0.1.11.tgz#eac43d4a91d3a80cc1696f687cad6210028d6218"
-  integrity sha512-nsQHLp7AgI3zjed1DdJTLVChRpMMb1FpmdXKQPVkQNn2xpT5rfU2vbXipTDu3/z1yo4uhOVL0E3Q7t+TAQuZEg==
+wy-react-helper@^0.1.12:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/wy-react-helper/-/wy-react-helper-0.1.12.tgz#3d7fcf307ff4ef5c68fb6455b5b239b328d1c2b4"
+  integrity sha512-O4doya4az6WFWimcZSUdQBKFfX6kqn0i3qOZx+GdTPnylp9jBz+CvNfWQrpmglXPDW0noPBjN+m4qyUrfa97Tw==
+  dependencies:
+    wy-helper "^0.1.13"
 
 yallist@^3.0.2:
   version "3.1.1"

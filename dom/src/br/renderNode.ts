@@ -30,7 +30,7 @@ function renderIt(type: string, args: any, merge: typeof mergeFDomAttr) {
     style: {}
   }
   useKeep(props, args, ref, (oldAttrs, oldDes) => {
-    return merge(ref.current!, args, oldAttrs, oldDes, true)
+    return merge(ref.current!, args, oldAttrs, oldDes, ignoreKeys, true)
   }, renderListSV)
   for (const key in args) {
     const value = (args as any)[key]
