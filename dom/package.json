@@ -4,7 +4,7 @@
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "license": "MIT",
   "files": [
     "dist",
@@ -23,9 +23,9 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "wy-dom-helper": "^0.1.10",
-    "wy-helper": "^0.1.12",
-    "wy-react-helper": "^0.1.11"
+    "wy-dom-helper": "^0.1.11",
+    "wy-helper": "^0.1.13",
+    "wy-react-helper": "^0.1.12"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
@@ -37,8 +37,8 @@
     "vite-plugin-dts": "^4.3.0"
   },
   "dependencies": {
-    "wy-dom-helper": "file:.yalc/wy-dom-helper",
-    "wy-helper": "file:.yalc/wy-helper",
-    "wy-react-helper": "file:.yalc/wy-react-helper"
+    "wy-dom-helper": "^0.1.11",
+    "wy-helper": "^0.1.13",
+    "wy-react-helper": "^0.1.12"
   }
 }

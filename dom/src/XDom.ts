@@ -98,11 +98,12 @@ export function useKeep(
   }
   return props
 }
-const ATTR_PREFIX = "a-"
+
 const S_PREFIX = "s-"
 const CSS_PREFIX = "css-"
+const CHILDREN_PREFIX = 'children'
 
-const ignoreKeys = ['children', 'childrenType']
+const ignoreKeys = ['ref']
 function create(tagNames: string[], merge: typeof mergeXDomAttr) {
   return createOrProxy(tagNames, function (tag) {
     return React.forwardRef(function (args: any, outRef) {
@@ -112,23 +113,20 @@ function create(tagNames: string[], merge: typeof mergeXDomAttr) {
         style: {}
       }
       useKeep(props, args, ref, (oldAttrs, oldDes) => {
-        return merge(ref.current!, args, oldAttrs, oldDes, true)
+        return merge(ref.current!, args, oldAttrs, oldDes, ignoreKeys, true)
       })
       for (const key in args) {
         const value = (args as any)[key]
         const isSync = !isEvent(key) && isSyncFun(value)
         if (!isSync) {
-          if (key.startsWith(ATTR_PREFIX)) {
-            const attrKey = key.slice(ATTR_PREFIX.length)
-            props[attrKey] = value
-          } else if (key.startsWith(S_PREFIX)) {
+          if (key.startsWith(S_PREFIX)) {
             const styleKey = key.slice(S_PREFIX.length)
             props.style[styleKey] = value
           } else if (key.startsWith(CSS_PREFIX)) {
             const cssVariable = key.slice(CSS_PREFIX.length)
             const cssVariableKey = `--${cssVariable}`
             props.style[cssVariableKey] = value
-          } else if (!ignoreKeys.includes(key)) {
+          } else if (!key.startsWith(CHILDREN_PREFIX)) {
             props[key] = value
           }
         }

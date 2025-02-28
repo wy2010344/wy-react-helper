@@ -1,14 +1,14 @@
-import { buildPromiseResultSetData, emptyFun, emptyObject, FalseType, GetPromiseRequest, GetValue, hookAbortSignalPromise, RequestPromiseFinally, RequestPromiseResult, RequestVersionPromiseFinally, RequestVersionPromiseReulst } from "wy-helper";
+import { AbortPromiseResult, buildPromiseResultSetData, emptyFun, emptyObject, FalseType, GetPromiseRequest, GetValue, hookAbortSignalPromise, RequestVersionPromiseFinally, SetValue, VersionPromiseResult } from "wy-helper";
 import { useEvent } from "./useEvent";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export function useRenderPromise<T>(
   /**触发事件 */
-  initFinally: RequestPromiseFinally<T>,
+  initFinally: SetValue<AbortPromiseResult<T>>,
   /**作为依赖,如果request发生改变,则触发依赖计算 */
   request?: GetPromiseRequest<T> | FalseType
 ) {
-  const onFinally: RequestPromiseFinally<T> = useEvent(function (data) {
+  const onFinally: SetValue<AbortPromiseResult<T>> = useEvent(function (data) {
     if (request == data.request) {
       //因为abort-signal自动控制了,所有中止后不会调用回来.
       initFinally(data)
@@ -17,11 +17,7 @@ export function useRenderPromise<T>(
   useEffect(() => {
     if (request) {
       const abortController = new AbortController()
-      hookAbortSignalPromise(abortController.signal, request, value => {
-        const v = value as RequestPromiseResult<T>
-        v.request = request
-        onFinally(v)
-      })
+      hookAbortSignalPromise(abortController.signal, request, onFinally)
       return abortController.abort.bind(abortController)
     }
   }, [request])
@@ -37,7 +33,7 @@ export function useRenderVersionPromise<T>(
     return ref.current++
   }, [request])
   useRenderPromise(data => {
-    const d = data as RequestVersionPromiseReulst<T>
+    const d = data as VersionPromiseResult<T>
     d.version = version
     initFinally(d)
   }, request)
@@ -63,7 +59,7 @@ export function useMemoPromise<T>(
     onError?(err: any): void
   } = emptyObject
 ) {
-  const [data, setData] = useState<RequestPromiseResult<T>>()
+  const [data, setData] = useState<AbortPromiseResult<T>>()
   useRenderPromise(function (data) {
     if (data.type == 'error') {
       onError?.(data.value)
