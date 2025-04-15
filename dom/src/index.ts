@@ -1,7 +1,3 @@
-import { useMemo } from 'react'
-import { animateFrame } from 'wy-dom-helper'
-import { emptyArray } from 'wy-helper'
-
 export * from './useTransitionValue'
 export * from './useMatchMedia'
 export * from './useOnLine'
@@ -17,6 +13,3 @@ export * from './br/attr'
 export * from './useBigSpin'
 export * from './XDom'
 export * from './br/renderNode'
-export function useAnimateFrame(value: number) {
-  return useMemo(() => animateFrame(value), emptyArray)
-}

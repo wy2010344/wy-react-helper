@@ -1,4 +1,4 @@
-import { useVersion } from './useVersion';
+import { useVersion } from "./useVersion";
 import {
   alawaysTrue,
   createEmptyExitListCache,
@@ -9,11 +9,11 @@ import {
   ExitModel,
   FalseType,
   quote,
-} from 'wy-helper';
-import { useAtomFun } from './useRefConst';
-import React, { useEffect } from 'react';
-import { HookRender } from './HookRender';
-import { useVersionLock } from './Lock';
+} from "wy-helper";
+import { useAtomFun } from "./useRefConst";
+import React, { useEffect } from "react";
+import { HookRender } from "./HookRender";
+import { useVersionLock } from "./Lock";
 export function useExitAnimate<V>(
   outlist: readonly V[],
   getKey: (v: V) => any,
@@ -58,7 +58,7 @@ export function renderExitAnimate<V>(
   list: readonly ExitModel<V>[],
   render: (row: ExitModel<V>) => JSX.Element
 ) {
-  return list.map(row => {
+  return list.map((row) => {
     return (
       <HookRender
         key={row.key}
@@ -112,11 +112,11 @@ export function IfExitAnimate<T>({
       list={show ? [show] : other?.renderFalse ? [show] : emptyArray}
       getKey={renderIfGetKey}
       {...other}
-      render={function(v) {
+      render={function (v) {
         if (v.value) {
-          return renderTrue(v);
+          return renderTrue(v as any);
         } else if (other?.renderFalse) {
-          return other.renderFalse(v);
+          return other.renderFalse(v as any);
         }
         return <></>;
       }}
