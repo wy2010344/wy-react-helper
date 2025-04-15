@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { BDomEvent, DomElement, DomElementType, FMergeChildAttr, FDomAttribute, isEvent, isSyncFun, mergeFDomAttr, WithCenterMap } from "wy-dom-helper";
-import { EmptyFun, emptyObject, SetValue, SyncFun } from "wy-helper";
+import { BDomEvent, DomElement, DomElementType, FMergeChildAttr, FDomAttribute, isEvent, isSyncFun, mergeFDomAttr, WithCenterMap, domTagNames } from "wy-dom-helper";
+import { createOrProxy, EmptyFun, emptyObject, SetValue, SyncFun } from "wy-helper";
 import { mergeRefs, ReactRef, renderList, useAdd } from "wy-react-helper";
 import { useKeep } from "../XDom";
 
@@ -60,13 +60,27 @@ function renderIt(type: string, args: any, merge: typeof mergeFDomAttr) {
   useAdd(React.createElement(type, props))
   return ref
 }
+
+
+export type FDomAttributes<T extends DomElementType> = WithCenterMap<FDomAttribute<T>>
+  & BDomEvent<T>
+  & FMergeChildAttr<React.RefObject<DomElement<T>>>
+  & {
+    ref?: React.Ref<DomElement<T>>
+  }
 export function renderDom<T extends DomElementType>(
   type: T,
-  args: WithCenterMap<FDomAttribute<T>>
-    & BDomEvent<T>
-    & FMergeChildAttr<React.RefObject<DomElement<T>>>
-    & {
-      ref?: React.Ref<DomElement<T>>
-    } = emptyObject as any) {
+  args: FDomAttributes<T> = emptyObject as any) {
   return renderIt(type, args, mergeFDomAttr)
 }
+
+
+export const fdom: {
+  readonly [key in DomElementType]: {
+    (props?: FDomAttributes<key>): React.RefObject<DomElement<key>>
+  }
+} = createOrProxy(domTagNames, function (tag) {
+  return function (args: any) {
+    return renderDom(tag, args)
+  }
+}) as any

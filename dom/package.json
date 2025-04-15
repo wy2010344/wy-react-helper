@@ -1,10 +1,10 @@
 {
   "name": "wy-react-dom-helper",
   "author": "wy2010344",
-  "module": "dist/index.esm.js",
+  "module": "dist/index.mjs",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "license": "MIT",
   "files": [
     "dist",
@@ -23,9 +23,9 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "wy-dom-helper": "^0.1.11",
-    "wy-helper": "^0.1.13",
-    "wy-react-helper": "^0.1.12"
+    "wy-dom-helper": "^0.1.13",
+    "wy-helper": "^0.1.15",
+    "wy-react-helper": "^0.1.13"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
@@ -37,8 +37,8 @@
     "vite-plugin-dts": "^4.3.0"
   },
   "dependencies": {
-    "wy-dom-helper": "^0.1.11",
-    "wy-helper": "^0.1.13",
-    "wy-react-helper": "^0.1.12"
+    "wy-dom-helper": "^0.1.13",
+    "wy-helper": "^0.1.15",
+    "wy-react-helper": "^0.1.13"
   }
 }

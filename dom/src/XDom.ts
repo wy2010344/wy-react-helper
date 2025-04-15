@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { BDomEvent, BSvgEvent, DomElementType, domTagNames, DomType, isEvent, isSyncFun, mergeXDomAttr, mergeXSvgAttr, Props, SvgElementType, WithCenterMap, XDomAttribute, XSvgAttribute } from "wy-dom-helper";
+import { BDomEvent, BSvgEvent, DomElementType, domTagNames, isEvent, isSyncFun, mergeXDomAttr, mergeXSvgAttr, Props, SvgElementType, WithCenterMap, XDomAttribute, XSvgAttribute } from "wy-dom-helper";
 import { createOrProxy, emptyArray, emptyFun, EmptyFun, emptyObject, Quote, quote, SyncFun } from "wy-helper";
 import { mergeRefs, useConstFrom } from "wy-react-helper";
 
