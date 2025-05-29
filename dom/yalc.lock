@@ -2,19 +2,19 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "1a98e8e5a20bc36e730f21f86b8b8a4f",
+      "signature": "4efa5c1dc1e6094d78ded180a7e20013",
+      "file": true,
+      "replaced": "^0.1.15"
+    },
+    "wy-dom-helper": {
+      "signature": "fe91e640c94c8933b61f1d1017b5c68c",
       "file": true,
       "replaced": "^0.1.13"
     },
-    "wy-dom-helper": {
-      "signature": "9887f8e0a223c34052d038c9a437bc4d",
-      "file": true,
-      "replaced": "^0.1.11"
-    },
     "wy-react-helper": {
-      "signature": "e40dc86483d1d5b93b772a00b8636597",
+      "signature": "c5ca631195b70cf4ac4440cfa7e41f53",
       "file": true,
-      "replaced": "^0.1.12"
+      "replaced": "^0.1.13"
     }
   }
 }

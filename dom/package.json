@@ -37,8 +37,8 @@
     "vite-plugin-dts": "^4.3.0"
   },
   "dependencies": {
-    "wy-dom-helper": "^0.1.13",
-    "wy-helper": "^0.1.15",
-    "wy-react-helper": "^0.1.13"
+    "wy-dom-helper": "file:.yalc/wy-dom-helper",
+    "wy-helper": "file:.yalc/wy-helper",
+    "wy-react-helper": "file:.yalc/wy-react-helper"
   }
 }
