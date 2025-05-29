@@ -1,6 +1,6 @@
-import { useEffect } from "react"
+import { startTransition, useEffect } from "react"
 import { useChangeFun } from "./useChange"
-import { EmptyFun, ReadValueCenter, quote } from "wy-helper"
+import { EmptyFun, ReadValueCenter, quote, run } from "wy-helper"
 
 /**
  * 
@@ -27,20 +27,38 @@ export function useSyncExternalStore<T>(subscribe: (callback: EmptyFun) => Empty
  * @param arg 只能初始化,中间不可以改变,即使改变,也是跟随的
  */
 export function useStoreTriggerRender<T, M>(store: ReadValueCenter<T>,
-  filter: (a: T) => M): M;
+  arg: {
+    triggerType?: SetStateTriggerType
+    filter: (a: T) => M
+  }
+): M;
 export function useStoreTriggerRender<T>(store: ReadValueCenter<T>,
-  filter?: (a: T) => T): T;
+  arg?: {
+    triggerType?: SetStateTriggerType
+    filter?: (a: T) => T
+  }
+): T;
 export function useStoreTriggerRender<T>(store: ReadValueCenter<T>) {
-  const filter = arguments[1] || quote
+  const args = arguments[1]
+  const filter = args?.filter || quote
+  const triggerType = args?.triggerType || run
   const [state, setState] = useChangeFun(() => filter(store.get()))
   useEffect(() => {
     const v = filter(store.get())
     if (state != v) {
-      setState(v)
+      triggerType(() => {
+        setState(v)
+      })
     }
     return store.subscribe(function (d) {
-      setState(filter(d))
+      triggerType(() => {
+        setState(filter(d))
+      })
     })
-  }, [store.subscribe, filter])
+  }, [store.subscribe, filter, triggerType])
   return state
 }
+/**
+ * 可以设值为flushSync,startTransition
+ */
+export type SetStateTriggerType = (callback: EmptyFun) => void

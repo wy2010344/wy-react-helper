@@ -37,7 +37,7 @@ export function useMemoAutoLoadMore<T, K>(
     }
     return t
   }, emptyArray)
-  const data = useStoreTriggerRender(center, filter)
+  const data = useStoreTriggerRender(center, { filter })
 
   useEffect(() => {
     dispatch({
