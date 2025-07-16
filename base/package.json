@@ -35,6 +35,6 @@
     "vite-plugin-dts": "^4.3.0"
   },
   "dependencies": {
-    "wy-helper": "^0.1.15"
+    "wy-helper": "file:.yalc/wy-helper"
   }
 }
