@@ -22,23 +22,6 @@ export function useRenderPromise<T>(
     }
   }, [request])
 }
-export function useRenderVersionPromise<T>(
-  /**触发事件 */
-  initFinally: RequestVersionPromiseFinally<T>,
-  /**作为依赖,如果request发生改变,则触发依赖计算 */
-  request?: GetPromiseRequest<T> | FalseType
-) {
-  const ref = useRef(1)
-  const version = useMemo(() => {
-    return ref.current++
-  }, [request])
-  useRenderPromise(data => {
-    const d = data as VersionPromiseResult<T>
-    d.version = version
-    initFinally(d)
-  }, request)
-  return version
-}
 
 export function useCallbackPromiseState<T>(
   outRequest: GetPromiseRequest<T>,
