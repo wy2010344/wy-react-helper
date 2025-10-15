@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, JSX } from 'react';
 import { Key } from 'react';
 import { EmptyFun, emptyObject, objectFreeze, SetValue } from 'wy-helper';
 import { useChange } from './useChange';
@@ -24,6 +24,7 @@ function useFinish(oldCtx: any[]) {
 }
 
 export function renderList(render: EmptyFun) {
+  /* eslint-disable */
   const ctx: any[] = [];
   const old = useCreate(ctx);
   render();
@@ -34,12 +35,13 @@ export function renderList(render: EmptyFun) {
 export function renderForEach(
   forEach: (callback: (key: Key, callback: EmptyFun) => void) => void
 ) {
+  /* eslint-disable */
   useAdd(
     React.createElement(
       React.Fragment,
       emptyObject,
-      renderList(function() {
-        forEach(function(key, callback) {
+      renderList(function () {
+        forEach(function (key, callback) {
           useAdd(
             React.createElement(React.Fragment, { key }, renderList(callback))
           );
@@ -59,7 +61,7 @@ export function renderArray<T>(
   getKey: (v: T, i: number) => React.Key,
   render: (v: T, i: number, key: React.Key) => void
 ) {
-  renderForEach(function(forEach) {
+  renderForEach(function (forEach) {
     for (let i = 0; i < array.length; i++) {
       const v = array[i];
       const key = getKey(v, i);

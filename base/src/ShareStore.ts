@@ -1,49 +1,49 @@
-import { ValueCenter } from "wy-helper"
+import { ValueCenter } from 'wy-helper';
 
 interface StringBridge<T> {
-  toString(v: T): string
-  fromString(v: string): T
-  value: ValueCenter<T>
+  toString(v: T): string;
+  fromString(v: string): T;
+  value: ValueCenter<T>;
 }
 
 export function defaultToString(v: any) {
-  return v + ""
+  return `${v}`;
 }
 export function jsonToString(v: object) {
-  return JSON.stringify(v)
+  return JSON.stringify(v);
 }
 export function createShareStore({
   map,
   read,
-  write
+  write,
 }: {
   map: {
-    [key: string]: StringBridge<any>
-  },
-  read(key: string): string
-  write(key: string, value: string): void
+    [key: string]: StringBridge<any>;
+  };
+  read(key: string): string;
+  write(key: string, value: string): void;
 }) {
   const mapList = Object.entries(map).map(function ([key, value]) {
     function notify(v: any) {
-      write(key, value.toString(v))
+      write(key, value.toString(v));
     }
     return {
       init() {
-        value.value.set(read(key))
+        value.value.set(read(key));
       },
-      destroy: value.value.subscribe(notify)
-    }
-  })
+      destroy: value.value.subscribe(notify),
+    };
+  });
   return {
     init() {
       mapList.forEach(function ({ init }) {
-        init()
-      })
+        init();
+      });
     },
     destroy() {
       mapList.forEach(function ({ destroy }) {
-        destroy()
-      })
-    }
-  }
+        destroy();
+      });
+    },
+  };
 }

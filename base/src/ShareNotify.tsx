@@ -3,7 +3,7 @@ import { HookRender } from './HookRender';
 import { getOnlyId } from './useOnlyId';
 import { useStoreTriggerRender } from './useStoreTriggerRender';
 import { valueCenterOf } from 'wy-helper';
-
+import { JSX } from 'react';
 type NotifyProps = {
   id: number;
   element: JSX.Element;
@@ -44,7 +44,7 @@ export function createSharePop() {
           element: v,
         })
       );
-      return function() {
+      return function () {
         notifyCenter.set(notifyCenter.get().filter(v => v.id != id));
       };
     },

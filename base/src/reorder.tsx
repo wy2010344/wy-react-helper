@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from "react";
-import { PointKey, ReadArray, Reorder, emptyArray, pointZero } from "wy-helper";
+import { useEffect, useMemo } from 'react';
+import { PointKey, ReadArray, Reorder, emptyArray, pointZero } from 'wy-helper';
 export function useReorder<T, K>(
   list: ReadArray<T>,
   getKey: (v: T) => K,
@@ -8,14 +8,14 @@ export function useReorder<T, K>(
   gap = 0
 ) {
   const rd = useMemo(() => {
-    const rd = new Reorder(moveItem, axis, gap)
-    return rd
-  }, emptyArray)
+    const rd = new Reorder(moveItem, axis, gap);
+    return rd;
+  }, emptyArray);
   useEffect(() => {
-    rd.updateLayoutList(moveItem, axis || 'y', list, getKey, gap)
-  })
+    rd.updateLayoutList(moveItem, axis || 'y', list, getKey, gap);
+  });
   useEffect(() => {
-    rd.end(pointZero)
-  }, [axis])
-  return rd
+    rd.end(pointZero);
+  }, [axis]);
+  return rd;
 }

@@ -1,0 +1,34 @@
+{
+  "name": "@wy-react-helper/workspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "wy-react-helper workspace root with Git hooks and commit standards",
+  "scripts": {
+    "commit": "cz",
+    "prepare": "husky",
+    "lint": "cd base && pnpm run lint && cd ../dom && pnpm run lint && cd ../native && pnpm run lint",
+    "lint:check": "cd base && pnpm run lint:check && cd ../dom && pnpm run lint:check && cd ../native && pnpm run lint:check",
+    "format": "cd base && pnpm run format && cd ../dom && pnpm run format && cd ../native && pnpm run format",
+    "format:check": "cd base && pnpm run format:check && cd ../dom && pnpm run format:check && cd ../native && pnpm run format:check",
+    "type-check": "cd base && pnpm run type-check && cd ../dom && pnpm run type-check && cd ../native && pnpm run type-check",
+    "build": "cd base && pnpm run build && cd ../dom && pnpm run build && cd ../native && pnpm run build"
+  },
+  "devDependencies": {
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/prettier-config": "workspace:*",
+    "eslint": "^9.37.0",
+    "prettier": "^3.6.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}

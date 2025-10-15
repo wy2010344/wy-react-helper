@@ -1,17 +1,38 @@
-# my react helper
+# wy-react-helper
 
-just use less of createContext,but with listener
+Base React helper utilities for wy framework.
 
-- ValueCenter
-  - useStoreTriggerRender
-- createSharePortal
-  - usePortals
-  - Portal
-  - PortalCall some component can't be copy but a key is need
-  - PortalFragmet wrapper children in a fragment
-- createShareStore
+## Features
 
-  - defaultToString
-  - jsonToString
+- **ValueCenter** - State management with listeners
+  - `useStoreTriggerRender` - Hook for triggering renders
+- **createSharePortal** - Shared portal management
+  - `usePortals` - Hook for managing portals
+  - `Portal` - Portal component
+  - `PortalCall` - Portal caller for components that can't be copied but need a key
+  - `PortalFragment` - Wrapper for children in a fragment
+- **createShareStore** - Shared store utilities
+  - `defaultToString` - Default toString function
+  - `jsonToString` - JSON toString function
+- **useOnlyId** - Unique ID hook
 
-- useOnlyId
+## Installation
+
+```bash
+npm install wy-react-helper
+# or
+pnpm add wy-react-helper
+```
+
+## Usage
+
+```tsx
+import { useStoreTriggerRender, createSharePortal } from 'wy-react-helper';
+
+// Use state management with listeners instead of createContext
+const store = useStoreTriggerRender(initialValue);
+```
+
+## Development
+
+See the [main README](../README.md) for development setup instructions.

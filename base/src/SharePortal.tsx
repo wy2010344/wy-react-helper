@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, JSX } from 'react';
 import { useValueCenterWith } from './ValueCenter';
 import { HookRender } from './HookRender';
 import { ValueCenter } from 'wy-helper';
@@ -16,6 +16,7 @@ function getId(key: any) {
 
 export type SharePortalModel = ValueCenter<JSX.Element>[];
 export function renderSharePortal(store: ValueCenter<SharePortalModel>) {
+  /* eslint-disable */
   return useMemo(() => {
     return (
       <HookRender
@@ -56,7 +57,7 @@ export function useCreateSharePortal() {
     append(value: ValueCenter<JSX.Element>) {
       const oldList = list.get().filter(v => v != value);
       list.set(oldList.concat(value));
-      return function() {
+      return function () {
         list.set(list.get().filter(v => v != value));
       };
     },

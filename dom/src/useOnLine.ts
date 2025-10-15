@@ -1,24 +1,22 @@
-import { useEffect } from "react"
-import { emptyArray } from "wy-helper"
-import { useChange } from "wy-react-helper"
-
-
+import { useEffect } from 'react';
+import { emptyArray } from 'wy-helper';
+import { useChange } from 'wy-react-helper';
 
 export function useOnLine() {
-  const [onLine, setOnLine] = useChange(navigator.onLine)
+  const [onLine, setOnLine] = useChange(navigator.onLine);
   useEffect(() => {
     function onLineFun() {
-      setOnLine(true)
+      setOnLine(true);
     }
     function offLineFun() {
-      setOnLine(false)
+      setOnLine(false);
     }
-    window.addEventListener("online", onLineFun)
-    window.addEventListener("offline", offLineFun)
+    window.addEventListener('online', onLineFun);
+    window.addEventListener('offline', offLineFun);
     return function () {
-      window.removeEventListener("online", onLineFun)
-      window.removeEventListener("offline", offLineFun)
-    }
-  }, emptyArray)
-  return onLine
+      window.removeEventListener('online', onLineFun);
+      window.removeEventListener('offline', offLineFun);
+    };
+  }, emptyArray);
+  return onLine;
 }

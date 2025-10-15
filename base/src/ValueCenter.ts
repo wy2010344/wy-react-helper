@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { emptyArray, ValueCenter, valueCenterOf } from "wy-helper";
+import { useMemo } from 'react';
+import { emptyArray, ValueCenter, valueCenterOf } from 'wy-helper';
 
 export function useValueCenter<T>(init: () => T): ValueCenter<T> {
   return useMemo(() => {

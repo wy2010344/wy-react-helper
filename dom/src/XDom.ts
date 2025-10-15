@@ -1,30 +1,50 @@
-import React, { useEffect, useRef } from "react";
-import { BDomEvent, BSvgEvent, DomElementType, domTagNames, isEvent, isSyncFun, mergeXDomAttr, mergeXSvgAttr, Props, SvgElementType, WithCenterMap, XDomAttribute, XSvgAttribute } from "wy-dom-helper";
-import { createOrProxy, emptyArray, emptyFun, EmptyFun, emptyObject, Quote, quote, SyncFun } from "wy-helper";
-import { mergeRefs, useConstFrom } from "wy-react-helper";
+import React, { useEffect, useRef } from 'react';
+import {
+  BDomEvent,
+  BSvgEvent,
+  DomElementType,
+  domTagNames,
+  isEvent,
+  isSyncFun,
+  mergeXDomAttr,
+  mergeXSvgAttr,
+  Props,
+  SvgElementType,
+  WithCenterMap,
+  XDomAttribute,
+  XSvgAttribute,
+} from 'wy-dom-helper';
+import {
+  createOrProxy,
+  emptyArray,
+  emptyFun,
+  EmptyFun,
+  emptyObject,
+  Quote,
+  quote,
+  SyncFun,
+} from 'wy-helper';
+import { mergeRefs, useConstFrom } from 'wy-react-helper';
 
-
-
-
-
+/* eslint-disable */
 function createSave() {
-  return new CreateSave()
+  return new CreateSave();
 }
-type ContentType = "html" | "text"
+type ContentType = 'html' | 'text';
 function updateContent(value: string, node: any, type: ContentType) {
   if (type == 'html') {
-    node.innerHTML = value
+    node.innerHTML = value;
   } else {
-    node.textContent = value
+    node.textContent = value;
   }
 }
 class CreateSave {
-  des: Record<string, EmptyFun> = {}
-  oldAttrs: any = emptyObject
+  des: Record<string, EmptyFun> = {};
+  oldAttrs: any = emptyObject;
 
-  private desContent: EmptyFun = emptyFun
-  private lastType: ContentType = undefined!
-  private lastContent: string | SyncFun<string> = ''
+  private desContent: EmptyFun = emptyFun;
+  private lastType: ContentType = undefined!;
+  private lastContent: string | SyncFun<string> = '';
 
   updateContent(
     node: any,
@@ -32,20 +52,20 @@ class CreateSave {
     content: string | SyncFun<string>
   ) {
     if (type == this.lastType && content == this.lastContent) {
-      return
+      return;
     }
-    this.lastType = type
-    this.lastContent = content
-    this.desContent()
+    this.lastType = type;
+    this.lastContent = content;
+    this.desContent();
     if (isSyncFun(content)) {
-      this.desContent = content(updateContent, node, type)
+      this.desContent = content(updateContent, node, type);
     } else {
-      this.desContent = emptyFun
+      this.desContent = emptyFun;
     }
   }
   destroy() {
     for (const key in this.des) {
-      this.des[key]()
+      this.des[key]();
     }
   }
 }
@@ -56,104 +76,93 @@ export function useKeep(
   merge: (oldAttrs: Props, oldDes: any) => any,
   toChildren: Quote<any> = quote
 ) {
-  const keep = useConstFrom(createSave)
+  const keep = useConstFrom(createSave);
   useEffect(() => {
-    keep.des = merge(keep.oldAttrs, keep.des)
-  })
+    keep.des = merge(keep.oldAttrs, keep.des);
+  });
   useEffect(() => {
     return () => {
-      keep.destroy()
-    }
-  }, emptyArray)
+      keep.destroy();
+    };
+  }, emptyArray);
   if (args.childrenType == 'html') {
     if (isSyncFun(args.children)) {
       useEffect(() => {
-        keep.updateContent(
-          ref.current!,
-          "html",
-          args.children
-        )
-      })
+        keep.updateContent(ref.current!, 'html', args.children);
+      });
     } else {
       props.dangerouslySetInnerHTML = {
-        __html: args.children
-      }
+        __html: args.children,
+      };
     }
   } else if (args.childrenType == 'text') {
     if (isSyncFun(args.children)) {
       useEffect(() => {
-        keep.updateContent(
-          ref.current!,
-          "text",
-          args.children
-        )
-      })
+        keep.updateContent(ref.current!, 'text', args.children);
+      });
     } else {
-      props.children = [
-        args.children
-      ]
+      props.children = [args.children];
     }
   } else if (args.children) {
-    props.children = toChildren(args.children)
+    props.children = toChildren(args.children);
   }
-  return props
+  return props;
 }
 
-const S_PREFIX = "s-"
-const CSS_PREFIX = "css-"
-const CHILDREN_PREFIX = 'children'
+const S_PREFIX = 's-';
+const CSS_PREFIX = 'css-';
+const CHILDREN_PREFIX = 'children';
 
-const ignoreKeys = ['ref']
+const ignoreKeys = ['ref'];
 function create(tagNames: string[], merge: typeof mergeXDomAttr) {
   return createOrProxy(tagNames, function (tag) {
     return React.forwardRef(function (args: any, outRef) {
-      const ref = useRef(null)
+      const ref = useRef(null);
       const props: any = {
         ref: mergeRefs([outRef, ref]),
-        style: {}
-      }
+        style: {},
+      };
       useKeep(props, args, ref, (oldAttrs, oldDes) => {
-        return merge(ref.current!, args, oldAttrs, oldDes, ignoreKeys, true)
-      })
+        return merge(ref.current!, args, oldAttrs, oldDes, ignoreKeys, true);
+      });
       for (const key in args) {
-        const value = (args as any)[key]
-        const isSync = !isEvent(key) && isSyncFun(value)
+        const value = (args as any)[key];
+        const isSync = !isEvent(key) && isSyncFun(value);
         if (!isSync) {
           if (key.startsWith(S_PREFIX)) {
-            const styleKey = key.slice(S_PREFIX.length)
-            props.style[styleKey] = value
+            const styleKey = key.slice(S_PREFIX.length);
+            props.style[styleKey] = value;
           } else if (key.startsWith(CSS_PREFIX)) {
-            const cssVariable = key.slice(CSS_PREFIX.length)
-            const cssVariableKey = `--${cssVariable}`
-            props.style[cssVariableKey] = value
+            const cssVariable = key.slice(CSS_PREFIX.length);
+            const cssVariableKey = `--${cssVariable}`;
+            props.style[cssVariableKey] = value;
           } else if (!key.startsWith(CHILDREN_PREFIX)) {
-            props[key] = value
+            props[key] = value;
           }
         }
       }
-      return React.createElement(tag, props)
-    }) as any
-  }) as any
+      return React.createElement(tag, props);
+    }) as any;
+  }) as any;
 }
 export const Dom: {
   readonly [key in DomElementType]: {
     (
-      args?: WithCenterMap<XDomAttribute<key>>
-        & BDomEvent<key>
-        & {
-          children?: React.ReactNode
-        }): JSX.Element
-  }
-} = create(domTagNames, mergeXDomAttr)
-
+      args?: WithCenterMap<XDomAttribute<key>> &
+        BDomEvent<key> & {
+          children?: React.ReactNode;
+        }
+    ): JSX.Element;
+  };
+} = create(domTagNames, mergeXDomAttr);
 
 export const Svg: {
   readonly [key in SvgElementType]: {
     (
-      args?: WithCenterMap<XSvgAttribute<key>>
-        & BSvgEvent<key>
-        & {
-          children?: React.ReactNode
-        }): JSX.Element
-  }
-} = create(domTagNames, mergeXSvgAttr)
+      args?: WithCenterMap<XSvgAttribute<key>> &
+        BSvgEvent<key> & {
+          children?: React.ReactNode;
+        }
+    ): JSX.Element;
+  };
+} = create(domTagNames, mergeXSvgAttr);

@@ -1,30 +1,39 @@
-# React + TypeScript + Vite
+# wy-react-native
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React Native helper utilities for wy framework.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Mobile-optimized utilities** - React Native specific helpers
+- **Gesture handling** - Enhanced gesture management
+- **Animation utilities** - Optimized animation helpers
+- **Navigation helpers** - React Native navigation utilities
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```bash
+npm install wy-react-native
+# or
+pnpm add wy-react-native
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Peer Dependencies
+
+- `react` (any version)
+- `react-native` (any version)
+- `react-native-gesture-handler` >= 1.8.0
+- `react-native-reanimated` >= 2.1.0
+- `wy-helper` (workspace dependency)
+- `wy-react-helper` (workspace dependency)
+
+## Usage
+
+```tsx
+import {} from /* React Native utilities */ 'wy-react-native';
+
+// React Native specific utilities
+```
+
+## Development
+
+See the [main README](../README.md) for development setup instructions.

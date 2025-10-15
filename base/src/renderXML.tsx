@@ -1,5 +1,5 @@
-import React from "react";
-import { GetDefine, XMLParams, getRenderXMLFun } from "wy-helper/tokenParser";
+import React from 'react';
+import { GetDefine, XMLParams, getRenderXMLFun } from 'wy-helper/tokenParser';
 
 export type RenderFun<T> = (arg: XMLParams<T>) => T;
 export type MapDefine<T> = {
@@ -9,12 +9,12 @@ export type MapDefun<T> = {
   (type: string, args: XMLParams<T>): T;
 };
 function mapToSingle<T>(defMap: MapDefun<T> | MapDefine<T>): GetDefine<T> {
-  if (typeof defMap == "function") {
+  if (typeof defMap == 'function') {
     return defMap;
   }
   return function (tag, value) {
     const def = defMap[tag];
-    if (typeof def == "function") {
+    if (typeof def == 'function') {
       return (def as any)(value);
     } else {
       return def;
@@ -22,7 +22,7 @@ function mapToSingle<T>(defMap: MapDefun<T> | MapDefine<T>): GetDefine<T> {
   };
 }
 const renderXML2StrJoin = getRenderXMLFun<string | number>(function (vs) {
-  return vs.join("");
+  return vs.join('');
 });
 export function renderXML2Str(
   value: string,

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { emptyArray } from "wy-helper";
+import { useEffect, useState } from 'react';
+import { emptyArray } from 'wy-helper';
 
 export const useDimension = () => {
   // Initializing state to store width and height (object)
@@ -21,9 +21,9 @@ export const useDimension = () => {
   useEffect(() => {
     updateDimension();
     // Adding a resize event listener to update dimensions on window resize
-    window.addEventListener("resize", updateDimension);
+    window.addEventListener('resize', updateDimension);
     // Cleaning up the event listener when the component unmounts
-    return () => window.removeEventListener("resize", updateDimension);
+    return () => window.removeEventListener('resize', updateDimension);
   }, emptyArray);
 
   // Returning the dimension state

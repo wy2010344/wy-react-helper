@@ -1,7 +1,7 @@
-import { ReadValueCenter } from "wy-helper";
-import { useEffect } from "react";
-import { useStoreTriggerRender } from "wy-react-helper";
-import { subscribeRequestAnimationFrame } from "wy-dom-helper";
+import { ReadValueCenter } from 'wy-helper';
+import { useEffect } from 'react';
+import { useStoreTriggerRender } from 'wy-react-helper';
+import { subscribeRequestAnimationFrame } from 'wy-dom-helper';
 
 export function useBigSpin(
   drawValue: ReadValueCenter<boolean>,

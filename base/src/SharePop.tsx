@@ -1,59 +1,58 @@
-import React from "react";
-import { getOutResolvePromise, valueCenterOf } from "wy-helper";
-import { useStoreTriggerRender } from "./useStoreTriggerRender";
-
+import React from 'react';
+import { getOutResolvePromise, valueCenterOf } from 'wy-helper';
+import { useStoreTriggerRender } from './useStoreTriggerRender';
 
 function initSharePop(): {
   stacks: {
-    children: React.ReactNode
-    resolve(v: any): void
-  }[],
-  method?: 'push' | 'pop'
+    children: React.ReactNode;
+    resolve(v: any): void;
+  }[];
+  method?: 'push' | 'pop';
 } {
   return {
-    stacks: []
-  }
+    stacks: [],
+  };
 }
 /**
  * pop只有一个,是一种弹窗路由.
  * 从router一样,应该使用组件本身作为key.
  * 只展示最后一个
- * 
+ *
  * 是否可以通过context传递useContent?
  * 当然可以包装在context里
- * @returns 
+ * @returns
  */
 export function createSharePop() {
-  const popCenter = valueCenterOf(initSharePop())
+  const popCenter = valueCenterOf(initSharePop());
   return {
     useProvider() {
-      return useStoreTriggerRender(popCenter)
+      return useStoreTriggerRender(popCenter);
     },
     size() {
-      return popCenter.get().stacks.length
+      return popCenter.get().stacks.length;
     },
     push<T>(element: React.ReactNode) {
-      const { stacks } = popCenter.get()
-      const [promise, resolve] = getOutResolvePromise<T>()
+      const { stacks } = popCenter.get();
+      const [promise, resolve] = getOutResolvePromise<T>();
       popCenter.set({
         stacks: stacks.concat({
           children: element,
-          resolve
+          resolve,
         }),
-        method: "push"
-      })
-      return promise
+        method: 'push',
+      });
+      return promise;
     },
     back(n?: any) {
-      const stacks = popCenter.get().stacks.slice()
-      const last = stacks.pop()
+      const stacks = popCenter.get().stacks.slice();
+      const last = stacks.pop();
       if (last) {
-        last.resolve(n)
+        last.resolve(n);
         popCenter.set({
           stacks,
-          method: "pop"
-        })
+          method: 'pop',
+        });
       }
-    }
-  }
+    },
+  };
 }

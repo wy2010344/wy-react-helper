@@ -1,5 +1,5 @@
-import { arrayToMove, reorderCheckTarget } from "wy-helper";
-import { SharedValue, cancelAnimation } from 'react-native-reanimated'
+import { arrayMove, reorderCheckTarget } from 'wy-helper';
+import { SharedValue, cancelAnimation } from 'react-native-reanimated';
 
 export function reAnimatedMoveItem<T>(
   positions: T[],
@@ -12,31 +12,35 @@ export function reAnimatedMoveItem<T>(
 ) {
   'worklet';
   // console.log("change", positions.value, () => SONG_HEIGHT, song.id, e.translationY)
-  const list = positions
-  const idx = list.findIndex(v => getKey(v) == key)
+  const list = positions;
+  const idx = list.findIndex(v => getKey(v) == key);
   if (idx < 0) {
-    return [undefined] as const
+    return [undefined] as const;
   }
-  let beHeight = 0
+  let beHeight = 0;
   for (let i = 0; i < idx; i++) {
-    beHeight += getHeight(positions[i])
+    beHeight += getHeight(positions[i]);
   }
-  const offset = topValue - beHeight
+  const offset = topValue - beHeight;
   // getSONEHGIEHG()
-  const toMove = reorderCheckTarget(positions, getKey, getHeight, key, offset, velocity)
+  const toMove = reorderCheckTarget(
+    positions,
+    idx,
+    getHeight,
+    offset,
+    velocity
+  );
   if (toMove) {
-    const toKey = getKey(toMove)
-    const idx1 = list.findIndex(v => getKey(v) == toKey)
+    const toKey = getKey(positions[toMove[1]]);
+    const idx1 = list.findIndex(v => getKey(v) == toKey);
     if (idx1 < 0) {
-      return [undefined, idx] as const
+      return [undefined, idx] as const;
     }
-    moveIt(key, toKey)
-    return [arrayToMove(list, idx, idx1), idx1] as const
+    moveIt(key, toKey);
+    return [arrayMove(list, idx, idx1, true), idx1] as const;
   }
-  return [undefined, idx] as const
+  return [undefined, idx] as const;
 }
-
-
 
 export function changeScrollValue(
   scrollY: SharedValue<number>,
@@ -53,7 +57,7 @@ export function changeScrollValue(
     const diff = Math.min(lowerBound - topValue, lowerBound);
     //Scroll up
     scrollY.value -= diff;
-    return -diff
+    return -diff;
     // tempY.value -= diff
     // topValue -= diff
   } else if (topValue > upperBound) {
@@ -61,11 +65,11 @@ export function changeScrollValue(
     //Scroll down
     const diff = Math.min(topValue - upperBound, scrollHeight);
     scrollY.value += diff;
-    return diff
+    return diff;
     // tempY.value += diff
     // topValue += diff
   } else {
-    cancelAnimation(scrollY)
+    cancelAnimation(scrollY);
   }
-  return 0
+  return 0;
 }

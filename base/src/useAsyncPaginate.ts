@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useLatestRequestLoading } from "./usePromise";
-import { useChange } from "./useChange";
-import { useBuildSubSetObject } from "./util";
-import { PromiseResult, buildPromiseResultSetData, emptyFun } from "wy-helper";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLatestRequestLoading } from './usePromise';
+import { useChange } from './useChange';
+import { useBuildSubSetObject } from './util';
+import { PromiseResult, buildPromiseResultSetData, emptyFun } from 'wy-helper';
 /**
  * 所有页数
  * @todo 移除直接修改状态,改为与外部进行合并
@@ -28,21 +28,19 @@ function useBaseAsyncPaginate<T, K>(
 ) {
   const [page, setPage] = useChange(initKey);
   const [request, loading] = useLatestRequestLoading(
-    async function (
-      [page]: [K]
-    ): Promise<PromiseResultWithPage<T, K>> {
-      const promise = getPage(page)
+    async function ([page]: [K]): Promise<PromiseResultWithPage<T, K>> {
+      const promise = getPage(page);
       try {
         const out = await promise;
         return {
-          type: "success",
+          type: 'success',
           page,
           promise,
           value: out,
         };
       } catch (err) {
         return {
-          type: "error",
+          type: 'error',
           page,
           promise,
           value: err,
@@ -50,7 +48,7 @@ function useBaseAsyncPaginate<T, K>(
       }
     },
     function (res) {
-      if (res.type == "success") {
+      if (res.type == 'success') {
         effect(res.value);
       }
     }
@@ -76,10 +74,10 @@ type NormalResult<T> = {
 };
 type AsyncPaginateModel<T, K> =
   | {
-    page: K;
-    version: number;
-    data: PromiseResult<T>;
-  }
+      page: K;
+      version: number;
+      data: PromiseResult<T>;
+    }
   | undefined;
 export function useAsyncPaginate<T>(
   {
@@ -96,7 +94,7 @@ export function useAsyncPaginate<T>(
   const { page, loading, setPage } = useBaseAsyncPaginate(
     function (res) {
       set_Data(res);
-      if (res.type == "error") {
+      if (res.type == 'error') {
         onError(res.value);
       }
     },
@@ -107,8 +105,8 @@ export function useAsyncPaginate<T>(
   const setData = buildPromiseResultSetData(set_Data);
   let count = 0;
   let list: T[] = [];
-  const setList = useBuildSubSetObject(setData, "list");
-  if (data?.type == "success") {
+  const setList = useBuildSubSetObject(setData, 'list');
+  if (data?.type == 'success') {
     count = data.value.count;
     list = data.value.list;
   }
@@ -121,9 +119,6 @@ export function useAsyncPaginate<T>(
     setPage,
   };
 }
-
-
-
 
 export function useSyncPaginate<A, T>(
   initPage: A,

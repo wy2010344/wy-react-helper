@@ -1,29 +1,27 @@
-import React, { useEffect, useMemo, useReducer, useRef } from "react";
-import { flushSync } from "react-dom";
-import { ComponentValueCache, subscribeEventListener } from "wy-dom-helper";
+import React, { useEffect, useMemo, useRef, JSX } from 'react';
+import { flushSync } from 'react-dom';
+import { ComponentValueCache, subscribeEventListener } from 'wy-dom-helper';
 import {
   contentEditableText,
   EditRecord,
   ContentEditableModel,
   fixScroll,
-  appendRecord,
   MbRange,
   initContentEditableModel,
   getCurrentEditRecord,
-} from "wy-dom-helper/contentEditable";
+} from 'wy-dom-helper/contentEditable';
 import {
   anyStoreTransform,
   emptyArray,
   GetValue,
   StoreTransform,
-} from "wy-helper";
+} from 'wy-helper';
 import {
   HookRender,
   useStoreTriggerRender,
   useValueCenter,
-  useValueCenterWith,
   useVersion,
-} from "wy-react-helper";
+} from 'wy-react-helper';
 
 const triggerArg = {
   triggerType: flushSync,
@@ -68,13 +66,14 @@ export function useContentEditable(value: ContentEditableModel) {
         <HookRender
           key={current.value}
           render={function () {
+            /* eslint-disable */
             const ref = useRef<HTMLElement>(null);
             useEffect(() => {
               const div = ref.current!;
               if (args.readonly) {
-                div.contentEditable = "false";
+                div.contentEditable = 'false';
               } else {
-                div.contentEditable = contentEditableText + "";
+                div.contentEditable = `${contentEditableText}`;
               }
             }, [args.readonly]);
             useEffect(() => {
@@ -92,7 +91,7 @@ export function useContentEditable(value: ContentEditableModel) {
   };
 }
 
-export type TriggerTime = "onInput" | "onBlur";
+export type TriggerTime = 'onInput' | 'onBlur';
 /**
  * T 模型值
  * V 从元素中取出来的值
@@ -102,7 +101,7 @@ export type TriggerTime = "onInput" | "onBlur";
 export function useContentEditablePure<T, V = T>(
   {
     getCache,
-    triggerTime = "onInput",
+    triggerTime = 'onInput',
     value,
     setValue,
     transform = anyStoreTransform as StoreTransform<T, V>,
@@ -132,14 +131,14 @@ export function useContentEditablePure<T, V = T>(
         //是否需要实时更新?flushSync?
         transform.fromComponent(cache.get(), setValue);
       };
-      if (triggerTime == "onInput") {
-        return subscribeEventListener(div, "input", update);
+      if (triggerTime == 'onInput') {
+        return subscribeEventListener(div, 'input', update);
       }
-      if (triggerTime == "onBlur") {
-        return subscribeEventListener(div, "blur", update);
+      if (triggerTime == 'onBlur') {
+        return subscribeEventListener(div, 'blur', update);
       }
     } else {
-      console.warn("not generate cache");
+      console.warn('not generate cache');
     }
   }, [triggerTime, ...deps]);
   useEffect(() => {

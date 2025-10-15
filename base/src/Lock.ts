@@ -1,39 +1,40 @@
-import { useEffect, useRef } from "react";
-import { ReadOnlyRef } from "./useAlaways";
-import { emptyArray } from "wy-helper"
-
+import { useEffect, useRef } from 'react';
+import { ReadOnlyRef } from './useAlaways';
+import { emptyArray } from 'wy-helper';
 
 /**
  * 版本锁
- * @param init 
- * @returns 
+ * @param init
+ * @returns
  */
 export function useVersionLock(init = 0) {
-  const ref = useRef(init)
-  return [ref as ReadOnlyRef<number>, function () {
-    return ++ref.current
-  }] as const
+  const ref = useRef(init);
+  return [
+    ref as ReadOnlyRef<number>,
+    function () {
+      return ++ref.current;
+    },
+  ] as const;
 }
 
 /**
  * 如果不是第一次,会是false
- * @returns 
+ * @returns
  */
 export function useIsLaunchLock() {
-  const ref = useRef(true)
+  const ref = useRef(true);
   useEffect(() => {
-    ref.current = false
-  }, emptyArray)
-  return ref.current
+    ref.current = false;
+  }, emptyArray);
+  return ref.current;
 }
 
-
 export function useOnceLock(value?: any) {
-  const ref = useRef(value)
+  const ref = useRef(value);
   useEffect(() => {
     if (value) {
-      ref.current = false
+      ref.current = false;
     }
-  }, [!value])
-  return ref.current
+  }, [!value]);
+  return ref.current;
 }

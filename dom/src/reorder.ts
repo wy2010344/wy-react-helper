@@ -1,10 +1,16 @@
-
-
-import { useReorder as useBaseReorder } from "wy-react-helper"
-import { reorderChildChangeIndex } from "wy-dom-helper"
-import { Box, EmptyFun, Point, ReorderChild, PointKey, emptyArray, ReadArray, emptyObject } from "wy-helper"
-import { useEffect, useMemo } from "react"
-
+import { useReorder as useBaseReorder } from 'wy-react-helper';
+import { reorderChildChangeIndex } from 'wy-dom-helper';
+import {
+  Box,
+  EmptyFun,
+  Point,
+  ReorderChild,
+  PointKey,
+  emptyArray,
+  ReadArray,
+  emptyObject,
+} from 'wy-helper';
+import { useEffect, useMemo } from 'react';
 
 export function useReorder<T, K>(
   list: ReadArray<T>,
@@ -12,13 +18,13 @@ export function useReorder<T, K>(
   moveItem: (itemKey: any, baseKey: any) => void,
   {
     gap,
-    axis
+    axis,
   }: {
-    gap?: number
-    axis?: PointKey,
+    gap?: number;
+    axis?: PointKey;
   } = emptyObject
 ) {
-  const rd = useBaseReorder(list, getKey, moveItem, axis, gap)
+  const rd = useBaseReorder(list, getKey, moveItem, axis, gap);
 
   return function (
     key: K,
@@ -29,20 +35,20 @@ export function useReorder<T, K>(
     onLayout: (diff: Point) => void,
     updateBox?: (box: Box) => void
   ) {
+    /* eslint-disable */
     const child = useMemo(() => {
-      return new ReorderChild(rd, key, getTrans, changeTo)
-    }, emptyArray)
+      return new ReorderChild(rd, key, getTrans, changeTo);
+    }, emptyArray);
     useEffect(() => {
-      return reorderChildChangeIndex(child, getDiv(), onLayout, updateBox)
-    }, [index])
-    return function (loc: Point,
-      onFinish: EmptyFun) {
-      child.start(loc, onFinish)
+      return reorderChildChangeIndex(child, getDiv(), onLayout, updateBox);
+    }, [index]);
+    return function (loc: Point, onFinish: EmptyFun) {
+      child.start(loc, onFinish);
       return {
         end: rd.end.bind(rd),
         move: rd.move.bind(rd),
-        setMoveDiff: rd.setMoveDiff.bind(rd)
-      }
-    }
-  }
+        setMoveDiff: rd.setMoveDiff.bind(rd),
+      };
+    };
+  };
 }

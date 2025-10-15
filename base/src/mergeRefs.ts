@@ -17,9 +17,8 @@ export function assignRef<T>(ref: ReactRef<T>, value: T | null): ReactRef<T> {
   return ref;
 }
 
-
 export function mergeRefs<T>(refs: ReactRef<T>[]): SetValue<T | null> {
   return function (v) {
-    refs.forEach(ref => assignRef(ref, v))
-  }
+    refs.forEach(ref => assignRef(ref, v));
+  };
 }
