@@ -1,13 +1,12 @@
 {
   "name": "wy-react-native",
-  "version": "1.0.1",
-  "type": "module",
-  "description": "React Native helper utilities for wy framework",
+  "version": "1.0.2",
+  "description": "React Native helper utilities and hooks",
   "keywords": [
     "react-native",
     "mobile",
     "utilities",
-    "wy"
+    "helper"
   ],
   "author": "wy2010344",
   "license": "MIT",

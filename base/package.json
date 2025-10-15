@@ -1,12 +1,12 @@
 {
   "name": "wy-react-helper",
-  "version": "0.2.1",
-  "description": "React helper utilities for wy framework",
+  "version": "0.2.2",
+  "description": "React helper utilities and hooks",
   "keywords": [
     "react",
     "hooks",
     "utilities",
-    "wy"
+    "helper"
   ],
   "author": "wy2010344",
   "license": "MIT",

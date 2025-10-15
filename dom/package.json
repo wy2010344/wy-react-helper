@@ -1,13 +1,12 @@
 {
   "name": "wy-react-dom-helper",
-  "version": "1.0.1",
-  "type": "module",
-  "description": "React DOM helper utilities for wy framework",
+  "version": "1.0.2",
+  "description": "React DOM helper utilities and hooks",
   "keywords": [
     "react",
     "dom",
     "utilities",
-    "wy"
+    "helper"
   ],
   "author": "wy2010344",
   "license": "MIT",

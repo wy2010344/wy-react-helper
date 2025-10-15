@@ -1,5 +1,11 @@
 # wy-react-helper
 
+## 0.2.2
+
+### Patch Changes
+
+- some package format fix
+
 ## 0.2.1
 
 ### Patch Changes
