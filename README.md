@@ -41,13 +41,3 @@ This project is part of a pseudo monorepo setup. To contribute:
    pnpm run lint:check
    pnpm run type-check
    ```
-
-## Publishing
-
-From the monorepo root:
-
-```bash
-pnpm changeset
-pnpm version-packages
-pnpm release
-```

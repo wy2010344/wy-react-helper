@@ -1,4 +1,5 @@
 import {
+  AliasMap,
   PairBranch,
   PairLeaf,
   PairNode,
@@ -7,7 +8,7 @@ import {
 } from 'wy-helper/router';
 import React from 'react';
 import { useCallbackPromise } from './useRenderPromise';
-import { cacheGet, GetValue, quote } from 'wy-helper';
+import { cacheGet, emptyObject, GetValue, quote } from 'wy-helper';
 
 export type BranchOrLeaf =
   | PairBranch<BranchLoader, LeafLoader, NotfoundLoader>
@@ -64,9 +65,10 @@ function renderLoader(branch: BranchOrLeaf): React.ReactNode {
 
 const LayoutComponent: React.FC<{
   branch: BranchOrLeaf;
+  useUse?: boolean;
   renderError(v: unknown): React.ReactNode;
-}> = function ({ branch, renderError }) {
-  if (hasUse) {
+}> = function ({ branch, renderError, useUse }) {
+  if (hasUse && useUse) {
     return renderLoader(branch);
   }
   /* eslint-disable */
@@ -96,19 +98,25 @@ const LayoutComponent: React.FC<{
 };
 
 export function createSimpleTree({
+  useUse,
+  treeArg = emptyObject,
+  aliasMap = emptyObject,
   prefix,
   pages,
   renderError,
 }: {
+  useUse?: boolean;
+  treeArg?: Record<string, (n: string) => any>;
   prefix: string;
+  aliasMap?: AliasMap;
   pages: Record<string, () => Promise<unknown>>;
   renderError(err: any): string;
 }) {
   const tree = new TreeRoute<BranchLoader, LeafLoader, NotfoundLoader>(
-    {},
+    treeArg,
     cacheGet
   );
-
+  tree.buildFromAlias(aliasMap);
   tree.buildFromMap(pages, prefix);
   tree.finishBuild();
   return {
@@ -130,7 +138,13 @@ export function createSimpleTree({
       if (branch.type == 'error') {
         return renderError(branch.value);
       }
-      return <LayoutComponent branch={branch} renderError={renderError} />;
+      return (
+        <LayoutComponent
+          useUse={useUse}
+          branch={branch}
+          renderError={renderError}
+        />
+      );
     },
   };
 }

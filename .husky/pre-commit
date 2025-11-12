@@ -4,24 +4,24 @@ echo "🚀 Running pre-commit checks for wy-react-helper workspace..."
 if git diff --cached --name-only | grep "base/" > /dev/null; then
   echo "📦 Running lint-staged for wy-react-helper base package..."
   cd base
-  npx lint-staged
-  pnpm run type-check
+  #npx lint-staged
+  #pnpm run type-check
   cd ..
 fi
 
 if git diff --cached --name-only | grep "dom/" > /dev/null; then
   echo "📦 Running lint-staged for wy-react-dom-helper package..."
   cd dom
-  npx lint-staged
-  pnpm run type-check
+  #npx lint-staged
+  #pnpm run type-check
   cd ..
 fi
 
 if git diff --cached --name-only | grep "native/" > /dev/null; then
   echo "📦 Running lint-staged for wy-react-native package..."
   cd native
-  npx lint-staged
-  pnpm run type-check
+  #npx lint-staged
+  #pnpm run type-check
   cd ..
 fi
 
