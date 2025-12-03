@@ -27,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           # 缓存npm依赖
           cache: 'npm'
           # 缓存目录设置

@@ -1,23 +1,101 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
-.heroBanner {
-  padding: 4rem 0;
+.hero {
+  background-color: var(--ifm-color-primary-lightest);
+  border-radius: var(--ifm-global-radius);
+  padding: var(--ifm-spacing-vertical-xl) var(--ifm-spacing-horizontal-xl);
+  margin-bottom: var(--ifm-spacing-vertical-xl);
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--ifm-spacing-vertical-md);
+  color: var(--ifm-color-primary-dark);
 }
 
-.buttons {
+.hero p {
+  font-size: 1.2rem;
+  color: var(--ifm-color-gray-700);
+  max-width: 800px;
+  margin: 0 auto var(--ifm-spacing-vertical-lg) auto;
+}
+
+.heroButtons {
   display: flex;
-  align-items: center;
   justify-content: center;
+  gap: var(--ifm-spacing-horizontal-md);
+  flex-wrap: wrap;
+}
+
+.featureSection {
+  margin-bottom: var(--ifm-spacing-vertical-xl);
+}
+
+.featureSection h2 {
+  text-align: center;
+  margin-bottom: var(--ifm-spacing-vertical-lg);
+  color: var(--ifm-color-primary-dark);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--ifm-spacing-vertical-xl);
+  margin-top: var(--ifm-spacing-vertical-lg);
+}
+
+.feature {
+  background-color: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-global-radius);
+  padding: var(--ifm-spacing-vertical-lg) var(--ifm-spacing-horizontal-lg);
+  box-shadow: var(--ifm-global-shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--ifm-global-shadow-md);
+}
+
+.feature h3 {
+  color: var(--ifm-color-primary);
+  margin-bottom: var(--ifm-spacing-vertical-md);
+  font-size: 1.5rem;
+}
+
+.feature ul {
+  padding-left: var(--ifm-list-left-padding);
+}
+
+.feature li {
+  margin-bottom: var(--ifm-spacing-vertical-sm);
+}
+
+.gettingStartedSection {
+  background-color: var(--ifm-color-primary-lightest);
+  border-radius: var(--ifm-global-radius);
+  padding: var(--ifm-spacing-vertical-xl) var(--ifm-spacing-horizontal-xl);
+}
+
+.gettingStartedSection h2 {
+  text-align: center;
+  margin-bottom: var(--ifm-spacing-vertical-lg);
+  color: var(--ifm-color-primary-dark);
+}
+
+.codeBlock {
+  margin: var(--ifm-spacing-vertical-md) 0;
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+  }
 }
