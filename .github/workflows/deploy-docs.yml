@@ -1,0 +1,59 @@
+name: Deploy Documentation
+
+on:
+  # 在main分支上的push事件触发
+  push:
+    branches: [main]
+    # 只在website目录或相关包目录下有更改时触发
+    paths:
+      - 'website/**'
+      - 'base/**'
+      - 'dom/**'
+      - 'native/**'
+
+  # 允许手动触发工作流
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # 确保获取完整的历史记录
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          # 缓存npm依赖
+          cache: 'npm'
+          # 缓存目录设置
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        working-directory: website
+        run: npm install
+
+      - name: Build documentation
+        working-directory: website
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          # 使用GitHub Token进行部署
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # 构建输出目录
+          publish_dir: ./website/build
+          # 部署到gh-pages分支
+          publish_branch: gh-pages
+          # 提交信息
+          commit_message: 'deploy: update documentation'
+          # 用户名和邮箱设置
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          # 允许空提交（当没有更改时）
+          allow_empty_commit: true
