@@ -1,6 +1,22 @@
 import { useMemo, useState } from 'react';
 import { emptyArray, Quote, SetValue } from 'wy-helper';
 
+export function useOptimistic<T>(value: T) {
+  const [cache, setCache] = useState<{ value: T }>();
+  return {
+    value: cache ? cache.value : value,
+    set(v: T) {
+      setCache({
+        value: v,
+      });
+    },
+    reset() {
+      setCache(undefined);
+    },
+    loading: Boolean(cache?.value),
+  };
+}
+
 type Op<T> = {
   id: number;
   callback: Quote<T>;

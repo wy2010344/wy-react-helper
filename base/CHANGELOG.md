@@ -1,5 +1,12 @@
 # wy-react-helper
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - wy-helper@1.1.0
+
 ## 0.2.4
 
 ### Patch Changes
