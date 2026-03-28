@@ -1,7 +1,10 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  entry: ['./src/index.ts'],
+  entry: {
+    index: './src/index.ts',
+    'state-function': './src/state-function/index.ts',
+  },
   platform: 'neutral',
   dts: true,
   external: ['react', 'wy-helper'],

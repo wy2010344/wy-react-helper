@@ -1,5 +1,16 @@
 # wy-react-dom-helper
 
+## 2.0.1
+
+### Patch Changes
+
+- update
+
+- Updated dependencies []:
+  - wy-dom-helper@2.0.1
+  - wy-helper@1.1.1
+  - wy-react-helper@1.0.1
+
 ## 2.0.0
 
 ### Patch Changes

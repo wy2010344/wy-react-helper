@@ -1,6 +1,6 @@
 {
   "name": "wy-react-helper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React helper utilities and hooks",
   "keywords": [
     "react",
@@ -31,6 +31,12 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./state-function": {
+      "development": "./src/state-function/index.ts",
+      "types": "./dist/state-function.d.ts",
+      "import": "./dist/state-function.mjs",
+      "require": "./dist/state-function.js"
     },
     "./package.json": "./package.json"
   },
