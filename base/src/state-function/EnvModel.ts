@@ -12,20 +12,35 @@ export class EnvModel implements IEnvModel<StateHolder> {
     readonly setRootState: Dispatch<SetStateAction<Map<any, any>>>,
     readonly cacheDeleteSet: Set<any>
   ) {}
+
+  private state?: 'used' | 'discarded';
+
+  discared() {
+    this.checkState();
+    this.state = 'discarded';
+  }
+  private checkState() {
+    if (this.state) {
+      throw new Error(`this envmodel is in state of ${this.state}`);
+    }
+  }
   static currentEnvModel: EnvModel;
   private deletions: StateHolder[] = [];
 
   addDelete(fiber: StateHolder): void {
+    this.checkState();
     this.deletions.push(fiber);
   }
   private changes: EmptyFun[] = [];
   commitChange(fun: EmptyFun): void {
+    this.checkState();
     this.changes.push(fun);
   }
 
   updateEffects = new Map<number, EmptyFun[]>();
   updateLayoutEffects = new Map<number, EmptyFun[]>();
   updateEffect = (level: number, layout: boolean, fun: EmptyFun) => {
+    this.checkState();
     effectsAddLevel(
       layout ? this.updateLayoutEffects : this.updateEffects,
       level,
@@ -34,8 +49,10 @@ export class EnvModel implements IEnvModel<StateHolder> {
   };
 
   commit() {
+    this.checkState();
     this.changes.forEach(run);
     this.deletions.forEach(fiber => notifyDel(fiber, this));
+    this.state = 'used';
   }
 }
 
