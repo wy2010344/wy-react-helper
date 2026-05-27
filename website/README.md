@@ -1,41 +1,31 @@
-# Website
+# wy-react-helper 文档站
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+本目录是 `wy-react-helper` 的文档网站，已将原 `website-1` Docusaurus 文档迁移到当前 Rspress 站点。
 
-## Installation
-
-```bash
-yarn
-```
-
-## Local Development
+## 安装依赖
 
 ```bash
-yarn start
+npm install
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-## Build
+## 本地开发
 
 ```bash
-yarn build
+npm run dev
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Deployment
-
-Using SSH:
+## 构建
 
 ```bash
-USE_SSH=true yarn deploy
+npm run build
 ```
 
-Not using SSH:
+## 预览构建结果
 
 ```bash
-GIT_USER=<Your GitHub username> yarn deploy
+npm run preview
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+## 文档入口
+
+打开首页后，点击“开始阅读”进入 `wy-react-helper` 文档。

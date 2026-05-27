@@ -6,7 +6,7 @@ import {
   PairNotfound,
   TreeRoute,
 } from 'wy-helper/router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useCallbackPromise } from './useRenderPromise';
 import { cacheGet, emptyObject, GetValue, quote } from 'wy-helper';
 
@@ -122,7 +122,7 @@ export function createSimpleTree({
   return {
     renderPath(path: string) {
       /* eslint-disable */
-      const branch = React.useMemo(() => {
+      const branch = useMemo(() => {
         try {
           const nodes = path.split('/').filter(quote);
           const out = tree.matchNodes(nodes);

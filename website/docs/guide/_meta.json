@@ -1,0 +1,22 @@
+[
+  {
+    "type": "dir-section-header",
+    "name": "start",
+    "label": "快速开始"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "base",
+    "label": "基础包"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "dom",
+    "label": "DOM 包"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "native",
+    "label": "Native 包"
+  }
+]
