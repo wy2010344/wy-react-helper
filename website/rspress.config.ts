@@ -4,6 +4,8 @@ import { defineConfig } from '@rspress/core'
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
   base: '/wy-react-helper/',
+  lang: 'zh-CN',
+  description: 'wy-react-helper, React 辅助库文档站',
   title: 'wy-react-helper',
   icon: '/rspress-icon.png',
   logo: {

@@ -1,5 +1,13 @@
 # wy-react-native
 
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - wy-helper@1.1.3
+  - wy-react-helper@1.0.3
+
 ## 2.0.2
 
 ### Patch Changes
